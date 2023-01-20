@@ -1,0 +1,6 @@
+images
+*.xlsx
+/images
+/node_modules
+*.env
+.env
