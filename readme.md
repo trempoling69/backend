@@ -12,7 +12,7 @@ dev en Node.js avec une bdd en MySQL
 - export excel
 - gestion de photo
 
-# update 21/01 
+### update 21/01 
 
 - Suppression du fichier checkJsonValue 
 - CheckuserInput amélioré pour qu'il soit utilisable pour aussi vérifier les données dans le xlsx
