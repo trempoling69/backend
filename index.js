@@ -34,34 +34,17 @@ const User = model.User;
 const Plante = model.Plante;
 const Quiz = model.Quiz;
 
-//? row dans la base de données
-let rowBddPlanteType = new Map([
-  ["nom", "string"],
-  ["description", "string"],
-  ["couleur_dispo", "string"],
-  ["type", "string"],
-  ["feuillage", "string"],
-  ["collection", "string"],
-  ["exposition", "string"],
-  ["hauteur", "string"],
-  ["mois_floraison", "string"],
-  ["periode_floraison", "string"],
-  ["besoin_eau", "string"],
-  ["photo", "string"],
-  ["dispo", "string"],
-  ["prix", "number"],
-  ["emplacement", "string"],
-  ["quantiteProd", "number"],
-  ["catchPhrase", "string"],
-]);
+//? row dans la base de données pour check les values des utilisateurs
 let configDonneeBdd = {
   nom: {
     type: "string",
     length: "200",
+    notNull: true,
   },
   description: {
     type: "string",
     length: "5000",
+    notNull: true,
   },
   couleur_dispo: {
     type: "string",
@@ -71,6 +54,7 @@ let configDonneeBdd = {
     type: "string",
     length: "50",
     valeurs: ["Vivaces", "annuelle", "Arbustes"],
+    notNull: true,
   },
   feuillage: {
     type: "string",
@@ -104,6 +88,10 @@ let configDonneeBdd = {
     length: "50",
     valeurs: ["un_peu", "beaucoup", "moyen"],
   },
+  photo: {
+    type: "string",
+    length: "100",
+  },
   dispo: {
     type: "string",
     length: "20",
@@ -126,6 +114,7 @@ let configDonneeBdd = {
     length: "200",
   },
 };
+const checkuserInputAdd = require("./CheckInput/CheckUserInputAdd");
 //------------------------------------------------------FIN GESTION BASE DE DONNEE-------------------------------------------------
 
 app.use(express.json());
@@ -143,7 +132,7 @@ app.use(
 //!login use*
 require("./middleware/passportConfig")(passport);
 //app.set("trust proxy", 1);
-app.use(cookieParser(process.env.SESSION_SECRET)); 
+app.use(cookieParser(process.env.SESSION_SECRET));
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -274,9 +263,8 @@ app.get("/api/exportxlsx", (req, res) => {
 //*permet d'envoyer un excel vers la bdd
 const importcsv = require("./excelRequest/importxlsx");
 const paths = require("path");
-const filepath = paths.join(__dirname, "bddplantes.xlsx");
+const filepath = paths.join(__dirname, "bddplantestest.xlsx");
 const UtilSheetName = ["vivaces", "annuelles", "arbustes"];
-const checkJsonValue = require("./excelRequest/checkJsonValue");
 
 app.get("/api/importxlsx", (req, res) => {
   importcsv(filepath, (object) => {
@@ -284,40 +272,40 @@ app.get("/api/importxlsx", (req, res) => {
       var sheetname = UtilSheetName[indexSheet];
       for (let index = 0; index < object[sheetname].length; index++) {
         if (
-          checkJsonValue(
+          checkuserInputAdd(
             object[sheetname][index],
+            configDonneeBdd,
             res,
-            rowBddPlanteType,
-            () => {
+            (data) => {
               Plante.findOrCreate({
                 logging: false,
                 where: {
-                  nom: object[sheetname][index]["nom"],
+                  nom: data.get("nom"),
                 },
                 defaults: {
-                  nom: object[sheetname][index]["nom"],
-                  description: object[sheetname][index]["description"],
-                  couleur_dispo: object[sheetname][index]["couleur_dispo"],
-                  type: object[sheetname][index]["type"],
-                  feuillage: object[sheetname][index]["feuillage"],
-                  collection: object[sheetname][index]["collection"],
-                  exposition: object[sheetname][index]["exposition"],
-                  hauteur: object[sheetname][index]["hauteur"],
-                  mois_floraison: object[sheetname][index]["mois_floraison"],
-                  periode_floraison:
-                    object[sheetname][index]["periode_floraison"],
-                  besoin_eau: object[sheetname][index]["besoin_eau"],
-                  photo: object[sheetname][index]["photo"],
-                  dispo: object[sheetname][index]["dispo"],
-                  prix: object[sheetname][index]["prix"],
-                  emplacement: object[sheetname][index]["emplacement"],
-                  quantiteProd: object[sheetname][index]["quantiteProd"],
-                  catchPhrase: object[sheetname][index]["catchPhrase"],
+                  nom: data.get("nom"),
+                  description: data.get("description"),
+                  couleur_dispo: data.get("couleur_dispo"),
+                  type: data.get("type"),
+                  feuillage: data.get("feuillage"),
+                  collection: data.get("collection"),
+                  exposition: data.get("exposition"),
+                  hauteur: data.get("hauteur"),
+                  mois_floraison: data.get("mois_floraison"),
+                  periode_floraison: data.get("periode_floraison"),
+                  besoin_eau: data.get("besoin_eau"),
+                  photo: data.get("photo"),
+                  dispo: data.get("dispo"),
+                  prix: data.get("prix"),
+                  emplacement: data.get("emplacement"),
+                  quantiteProd: data.get("quantiteProd"),
+                  catchPhrase: data.get("catchPhrase"),
                 },
               });
             }
           )
         ) {
+          res.end();
           return;
         }
       }
@@ -338,33 +326,46 @@ app.post("/api/insertplante", (req, res, next) => {
       console.log(err.message);
       res.status(400).send(err.message);
     } else {
-      checkInput(req, configDonneeBdd, res, (data) => {
-        Plante.create({
-          nom: data.get("nom"),
-          description: data.get("description"),
-          couleur_dispo: data.get("couleur_dispo"),
-          type: data.get("type"),
-          feuillage: data.get("feuillage"),
-          collection: data.get("collection"),
-          exposition: data.get("exposition"),
-          hauteur: data.get("hauteur"),
-          mois_floraison: data.get("mois_floraison"),
-          periode_floraison: data.get("periode_floraison"),
-          besoin_eau: data.get("besoin_eau"),
-          photo: req.file.filename,
-          dispo: data.get("dispo"),
-          prix: data.get("prix"),
-          emplacement: data.get("emplacement"),
-          quantiteProd: data.get("quantiteProd"),
-          catchPhrase: data.get("catchPhrase"),
-        })
-          .then((result) => {
-            res.status(200).send("plante ajouté");
+      if (
+        checkInput(req.body, configDonneeBdd, res, (data) => {
+          Plante.create({
+            nom: data.get("nom"),
+            description: data.get("description"),
+            couleur_dispo: data.get("couleur_dispo"),
+            type: data.get("type"),
+            feuillage: data.get("feuillage"),
+            collection: data.get("collection"),
+            exposition: data.get("exposition"),
+            hauteur: data.get("hauteur"),
+            mois_floraison: data.get("mois_floraison"),
+            periode_floraison: data.get("periode_floraison"),
+            besoin_eau: data.get("besoin_eau"),
+            photo: req.file.filename,
+            dispo: data.get("dispo"),
+            prix: data.get("prix"),
+            emplacement: data.get("emplacement"),
+            quantiteProd: data.get("quantiteProd"),
+            catchPhrase: data.get("catchPhrase"),
           })
-          .catch((err) => {
-            res.status(400).send(err.message);
-          });
-      });
+            .then((result) => {
+              res.status(200).send("plante ajouté");
+            })
+            .catch((err) => {
+              res.status(400).send(err.message);
+            });
+        })
+      ) {
+        fs.unlink(`images/${req.file.filename}`, (err) => {
+          if (err) {
+            console.log(err);
+            res.write("une erreur est survenu");
+            res.end();
+            return;
+          }
+          res.write(" . L'image n'a pas été enregistrée.");
+          res.end();
+        });
+      }
     }
   });
 });
