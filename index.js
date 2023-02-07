@@ -3,7 +3,6 @@ const app = express();
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const multer = require("multer");
-const excel = require("exceljs");
 const fs = require("fs");
 const sequelize = require("sequelize");
 
@@ -29,6 +28,7 @@ sequelizeconn
   });
 
 //? Gestion model bdd
+const { Op } = require("sequelize");
 const model = require("./db/model");
 const User = model.User;
 const Plante = model.Plante;
@@ -170,7 +170,7 @@ app.post("/login", (req, res) => {
         if (!user) {
           res.json({
             success: false,
-            message: "username or password incorrect",
+            message: "Username ou password incorrect",
           });
         } else {
           req.login(user, (err) => {
@@ -229,6 +229,14 @@ app.get("/", (req, res) => {
   res.send("private API of Rougy Horticulture");
 });
 
+const requestStats = require('./fctUtiles/requestStats')
+
+app.get("/api/stats", (req, res) => {
+ requestStats().then((countAll)=>{
+    res.json(Object.fromEntries(countAll));
+  })
+  
+});
 //*renvoie toutes les plantes
 app.get("/api/products", (req, res) => {
   Plante.findAll().then((plantes) => {
@@ -373,10 +381,11 @@ app.post("/api/insertplante", (req, res, next) => {
 //* permet de modifier une plante
 app.post("/api/modifplante", islogg, (req, res) => {
   upload(req, res, (err) => {
-    console.log(req.file);
     let photo = "";
     if (req.file === undefined) {
       photo = req.body.photo;
+    } else if (req.body.photo === "null") {
+      photo = req.file.filename;
     } else {
       const path = `./images/${req.body.photo}`;
       fs.unlink(path, (err) => {
@@ -413,13 +422,25 @@ app.post("/api/modifplante", islogg, (req, res) => {
 //requete DELETE
 //*permet de supprimer une plante
 app.delete("/api/supprimerplante/:id", islogg, (req, res) => {
-  Plante.destroy({ where: { id_plantes: req.params.id } })
-    .then((item) => {
-      res.json({ status: item });
-    })
-    .catch((err) => res.json({ error: err }));
+  Plante.findOne({where : {id_plantes: req.params.id}})
+  .then((plante)=>{
+    Plante.destroy({ where: { id_plantes: req.params.id } })
+      .then((item) => {
+        fs.unlink(`images/${plante.photo}`, (err) => {
+          if (err) {
+            res.write("une erreur est survenu");
+            res.end();
+            return;
+          }
+          res.json({ status: item });
+        });
+      })
+      .catch((err) => res.json({ error: err }));
+  })
 });
 
+
+//ROUTE TEST POUR UNE AUTRE APPLICATION
 app.get("/api/quiz/getall", (req, res) => {
   console.log(req.user);
   Quiz.findAll().then((quiz) => {
