@@ -31,90 +31,8 @@ sequelizeconn
 const { Op } = require("sequelize");
 const model = require("./db/model");
 const User = model.User;
-const Plante = model.Plante;
 const Quiz = model.Quiz;
 
-//? row dans la base de données pour check les values des utilisateurs
-let configDonneeBdd = {
-  nom: {
-    type: "string",
-    length: "200",
-    notNull: true,
-  },
-  description: {
-    type: "string",
-    length: "5000",
-    notNull: true,
-  },
-  couleur_dispo: {
-    type: "string",
-    length: "1000",
-  },
-  type: {
-    type: "string",
-    length: "50",
-    valeurs: ["Vivaces", "annuelle", "Arbustes"],
-    notNull: true,
-  },
-  feuillage: {
-    type: "string",
-    length: "40",
-    valeurs: ["caduque", "persistant", "null"],
-  },
-  collection: {
-    type: "string",
-    length: "100",
-  },
-  exposition: {
-    type: "string",
-    length: "50",
-    valeurs: ["Mi-Ombre", "Ombre", "Soleil", "Polyvalente", "null"],
-  },
-  hauteur: {
-    type: "string",
-    length: "20",
-  },
-  mois_floraison: {
-    type: "string",
-    length: "100",
-  },
-  periode_floraison: {
-    type: "string",
-    length: "20",
-    valeurs: ["été", "printemps", "automne", "hiver"],
-  },
-  besoin_eau: {
-    type: "string",
-    length: "50",
-    valeurs: ["un_peu", "beaucoup", "moyen"],
-  },
-  photo: {
-    type: "string",
-    length: "100",
-  },
-  dispo: {
-    type: "string",
-    length: "20",
-    valeurs: ["InStock", "OutStock"],
-  },
-  prix: {
-    type: "float",
-    length: "20",
-  },
-  emplacement: {
-    type: "string",
-    length: "50",
-  },
-  quantiteProd: {
-    type: "int",
-    length: "11",
-  },
-  catchPhrase: {
-    type: "string",
-    length: "200",
-  },
-};
-const checkuserInputAdd = require("./CheckInput/CheckUserInputAdd");
 //------------------------------------------------------FIN GESTION BASE DE DONNEE-------------------------------------------------
 
 app.use(express.json());
@@ -157,46 +75,56 @@ const islogg = (req, res, next) => {
 };
 //!login
 
+const checkLoginInput = require("./CheckInput/CheckUserInputAuth");
 app.post("/login", (req, res) => {
-  if (!req.body.username) {
-    res.json({ success: false, message: "Username was not given" });
-  } else if (!req.body.password) {
-    res.json({ success: false, message: "Password was not given" });
-  } else {
-    passport.authenticate("local", function (err, user, info) {
-      if (err) {
-        res.json({ success: false, message: err });
-      } else {
-        if (!user) {
-          res.json({
-            success: false,
-            message: "Username ou password incorrect",
-          });
+  checkLoginInput(req, res, (data) => {
+    req.body.username = data.get("username");
+    req.body.password = data.get("password");
+    console.log(req.body.username);
+    if (!data.get("username")) {
+      res.json({ success: false, message: "Username was not given" });
+    } else if (!data.get("password")) {
+      res.json({ success: false, message: "Password was not given" });
+    } else {
+      passport.authenticate("local", function (err, user, info) {
+        if (err) {
+          res.json({ success: false, message: err });
         } else {
-          req.login(user, (err) => {
-            if (err) throw err;
-            res.json({ success: true, message: "Authentication successful" });
-          });
+          if (!user) {
+            res.json({
+              success: false,
+              message: "Username ou password incorrect",
+            });
+          } else {
+            req.login(user, (err) => {
+              if (err) throw err;
+              res.json({ success: true, message: "Authentication successful" });
+            });
+          }
         }
-      }
-    })(req, res);
-  }
+      })(req, res);
+    }
+  });
 });
 
 //!register
 app.post("/register", islogg, (req, res) => {
-  User.count({ where: { username: req.body.username } }).then(async (count) => {
-    if (count != 0) {
-      res.send("useralready exist");
-    } else {
-      const hashedpassword = await bcrypt.hash(req.body.password, 10);
-      User.create({
-        username: req.body.username,
-        password: hashedpassword,
-      }).then(() => {
-        res.send("user created !");
-      });
-    }
+  checkLoginInput(req, res, (data) => {
+    User.count({ where: { username: data.get("username") } }).then(
+      async (count) => {
+        if (count != 0) {
+          res.send("useralready exist");
+        } else {
+          const hashedpassword = await bcrypt.hash(data.get("password"), 10);
+          User.create({
+            username: data.get("username"),
+            password: hashedpassword,
+          }).then(() => {
+            res.send("user created !");
+          });
+        }
+      }
+    );
   });
 });
 
@@ -211,234 +139,41 @@ app.get("/islogged", (req, res) => {
   res.send(req.isAuthenticated());
 });
 
-app.get("/user", islogg, (req, res) => {
-  console.log(req.user);
-  res.send(req.user.username);
-  console.log("auth?" + req.isAuthenticated());
-});
+const controllerUser = require("./controllers/user/controllerUser")
+app.get("/user", islogg, controllerUser.getUser);
 
-app.get("/allusers", islogg, (req, res) => {
-  User.findAll({
-    attributes: ["id_user", "username", "createdAt", "updatedAt", "lastConn"],
-  }).then((users) => {
-    res.json(users);
-  });
-});
+app.get("/allusers", islogg, controllerUser.getAllUser);
 
-app.get("/", (req, res) => {
-  res.send("private API of Rougy Horticulture");
-});
+const controllerInfo = require('./controllers/info/controllerInfo')
+app.get("/", controllerInfo.defaultLink);
 
-const requestStats = require('./fctUtiles/requestStats')
+app.get("/api/stats", islogg, controllerInfo.stats);
 
-app.get("/api/stats", (req, res) => {
- requestStats().then((countAll)=>{
-    res.json(Object.fromEntries(countAll));
-  })
-  
-});
 //*renvoie toutes les plantes
-app.get("/api/products", (req, res) => {
-  Plante.findAll().then((plantes) => {
-    res.json(plantes);
-  });
-});
+const controllerPlante = require('./controllers/plante/controllerPlante')
+app.get("/api/products", islogg, controllerPlante.allPlantes);
 
 //*renvoie une plante en fonction de son ID
-app.get("/api/products/:id", (req, res) => {
-  var id = req.params.id;
-  Plante.findOne({
-    where: {
-      id_plantes: id,
-    },
-  }).then((plantes) => {
-    if (plantes === null) {
-      res.send("rien a été trouvé");
-    } else {
-      res.json(plantes);
-    }
-  });
-});
+app.get("/api/products/:id", islogg, controllerPlante.planteById);
 
 //*renvoie un export en excel
-const exportxlsx = require("./excelRequest/exportxlsx");
-app.get("/api/exportxlsx", (req, res) => {
-  Plante.findAll().then((plantes) => {
-    exportxlsx(res, plantes, UtilSheetName);
-  });
-});
+const controllerExcel = require('./controllers/excel/controllerExcel')
+app.get("/api/exportxlsx", islogg, controllerExcel.exportationxlsx);
+
 //requete POST
 //*permet d'envoyer un excel vers la bdd
-const importcsv = require("./excelRequest/importxlsx");
-const paths = require("path");
-const filepath = paths.join(__dirname, "bddplantestest.xlsx");
-const UtilSheetName = ["vivaces", "annuelles", "arbustes"];
-
-app.get("/api/importxlsx", (req, res) => {
-  importcsv(filepath, (object) => {
-    for (let indexSheet = 0; indexSheet < UtilSheetName.length; indexSheet++) {
-      var sheetname = UtilSheetName[indexSheet];
-      for (let index = 0; index < object[sheetname].length; index++) {
-        if (
-          checkuserInputAdd(
-            object[sheetname][index],
-            configDonneeBdd,
-            res,
-            (data) => {
-              Plante.findOrCreate({
-                logging: false,
-                where: {
-                  nom: data.get("nom"),
-                },
-                defaults: {
-                  nom: data.get("nom"),
-                  description: data.get("description"),
-                  couleur_dispo: data.get("couleur_dispo"),
-                  type: data.get("type"),
-                  feuillage: data.get("feuillage"),
-                  collection: data.get("collection"),
-                  exposition: data.get("exposition"),
-                  hauteur: data.get("hauteur"),
-                  mois_floraison: data.get("mois_floraison"),
-                  periode_floraison: data.get("periode_floraison"),
-                  besoin_eau: data.get("besoin_eau"),
-                  photo: data.get("photo"),
-                  dispo: data.get("dispo"),
-                  prix: data.get("prix"),
-                  emplacement: data.get("emplacement"),
-                  quantiteProd: data.get("quantiteProd"),
-                  catchPhrase: data.get("catchPhrase"),
-                },
-              });
-            }
-          )
-        ) {
-          res.end();
-          return;
-        }
-      }
-    }
-    res.send(`Importation du fichier excel avec succès`);
-  });
-});
+app.post("/api/importxlsx", islogg, controllerExcel.importationxlsx)
 
 //*permet d'enregistrer une nouvelle plante
-const upload = require("./middleware/multer");
-const checkInput = require("./CheckInput/CheckUserInputAdd");
-app.post("/api/insertplante", (req, res, next) => {
-  upload(req, res, (err) => {
-    if (err instanceof multer.MulterError) {
-      console.log(err);
-      res.status(400).send(err.code);
-    } else if (err) {
-      console.log(err.message);
-      res.status(400).send(err.message);
-    } else {
-      if (
-        checkInput(req.body, configDonneeBdd, res, (data) => {
-          Plante.create({
-            nom: data.get("nom"),
-            description: data.get("description"),
-            couleur_dispo: data.get("couleur_dispo"),
-            type: data.get("type"),
-            feuillage: data.get("feuillage"),
-            collection: data.get("collection"),
-            exposition: data.get("exposition"),
-            hauteur: data.get("hauteur"),
-            mois_floraison: data.get("mois_floraison"),
-            periode_floraison: data.get("periode_floraison"),
-            besoin_eau: data.get("besoin_eau"),
-            photo: req.file.filename,
-            dispo: data.get("dispo"),
-            prix: data.get("prix"),
-            emplacement: data.get("emplacement"),
-            quantiteProd: data.get("quantiteProd"),
-            catchPhrase: data.get("catchPhrase"),
-          })
-            .then((result) => {
-              res.status(200).send("plante ajouté");
-            })
-            .catch((err) => {
-              res.status(400).send(err.message);
-            });
-        })
-      ) {
-        fs.unlink(`images/${req.file.filename}`, (err) => {
-          if (err) {
-            console.log(err);
-            res.write("une erreur est survenu");
-            res.end();
-            return;
-          }
-          res.write(" . L'image n'a pas été enregistrée.");
-          res.end();
-        });
-      }
-    }
-  });
-});
+app.post("/api/insertplante", islogg, controllerPlante.insertPlante);
 
 //* permet de modifier une plante
-app.post("/api/modifplante", islogg, (req, res) => {
-  upload(req, res, (err) => {
-    let photo = "";
-    if (req.file === undefined) {
-      photo = req.body.photo;
-    } else if (req.body.photo === "null") {
-      photo = req.file.filename;
-    } else {
-      const path = `./images/${req.body.photo}`;
-      fs.unlink(path, (err) => {
-        if (err) throw err;
-      });
-      photo = req.file.filename;
-    }
-    Plante.update(
-      {
-        nom: req.body.nom,
-        description: req.body.description,
-        couleur_dispo: req.body.couleurdispo,
-        type: req.body.type,
-        feuillage: req.body.feuillage,
-        collection: req.body.collection,
-        exposition: req.body.exposition,
-        hauteur: req.body.hauteur,
-        mois_floraison: req.body.mois_floraison,
-        periode_floraison: req.body.periode_floraison,
-        besoin_eau: req.body.besoin_eau,
-        photo: photo,
-        dispo: req.body.dispo,
-        prix: req.body.prix,
-        emplacement: req.body.emplacement,
-        quantiteProd: req.body.quantiteprod,
-      },
-      {
-        where: { id_plantes: req.body.id },
-      }
-    );
-  });
-});
+app.post("/api/modifplante", islogg, controllerPlante.modifPlante);
 
+app.post("/api/toggledispo", islogg, controllerPlante.toggleDispo);
 //requete DELETE
 //*permet de supprimer une plante
-app.delete("/api/supprimerplante/:id", islogg, (req, res) => {
-  Plante.findOne({where : {id_plantes: req.params.id}})
-  .then((plante)=>{
-    Plante.destroy({ where: { id_plantes: req.params.id } })
-      .then((item) => {
-        fs.unlink(`images/${plante.photo}`, (err) => {
-          if (err) {
-            res.write("une erreur est survenu");
-            res.end();
-            return;
-          }
-          res.json({ status: item });
-        });
-      })
-      .catch((err) => res.json({ error: err }));
-  })
-});
-
+app.delete("/api/supprimerplante/:id", islogg, controllerPlante.suppPlante);
 
 //ROUTE TEST POUR UNE AUTRE APPLICATION
 app.get("/api/quiz/getall", (req, res) => {

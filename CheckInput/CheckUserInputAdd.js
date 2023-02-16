@@ -10,7 +10,7 @@ const checkuserInputAdd = (req, rowbddtype, res, callback) => {
     if (req[key] == undefined || req[key] === "") {
       if(rowbddtype[key]["notNull"]){
         errorNotNull = true
-        errorMessage = `erreur sur le champs : ""${key}"" il ne peut pas être null dans ${JSON.stringify(req)}`;
+        errorMessage = `erreur sur le champs : ""${key}"" il ne peut pas être null dans ${JSON.stringify(req)} \n`;
       }else{
         notcheckvalue.set(key, "null");
       }
@@ -37,7 +37,7 @@ const checkuserInputAdd = (req, rowbddtype, res, callback) => {
           notcheckvalue.get(key).length > parseInt(value)
         ) {
           errorLenght = true;
-          errorMessage = `erreur sur le champs : ""${key}"" trop long maximum ${value} caractères pour [${notcheckvalue.get("nom")}]`;
+          errorMessage = `erreur sur le champs : ""${key}"" trop long maximum ${value} caractères pour [${notcheckvalue.get("nom")}] \n`;
         }
         //Check KeyWord
         if (
@@ -47,7 +47,7 @@ const checkuserInputAdd = (req, rowbddtype, res, callback) => {
           if (value.includes(notcheckvalue.get(key))) {
           } else {
             errorKeyWords = true;
-            errorMessage = `erreur sur le champs : ""${key}"" valeurs acceptées [${value}] pour [${notcheckvalue.get("nom")}]`;
+            errorMessage = `erreur sur le champs : ""${key}"" valeurs acceptées [${value}] pour [${notcheckvalue.get("nom")}] \n`;
           }
         }
         //check Type
@@ -71,9 +71,9 @@ const checkuserInputAdd = (req, rowbddtype, res, callback) => {
         ) {
           errorType = true;
           console.log(
-            `erreur sur le champs : ""${key}"" type attendu {${value}}`
+            `erreur sur le champs : ""${key}"" type attendu {${value}} \n`
           );
-          errorMessage = `erreur sur le champs : ""${key}"" type attendu {${value}} pour  [${notcheckvalue.get("nom")}]`;
+          errorMessage = `erreur sur le champs : ""${key}"" type attendu {${value}} pour  [${notcheckvalue.get("nom")}] \n`;
         }
       }
     }
