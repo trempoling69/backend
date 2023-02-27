@@ -104,6 +104,9 @@ exports.checkInputExcel = (plante, bddplante, index, filereport,resolve, callbac
           checkValue.set(nomcolonne, parseInt(checkValue.get(nomcolonne)));
         }
       }
+      if(params === "type" && parametre === "photo"){
+        checkValue.set(nomcolonne, cleanedValue(checkValue.get(nomcolonne)))
+      }
     }
   }
   callback(checkValue);

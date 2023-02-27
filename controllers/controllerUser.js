@@ -2,7 +2,6 @@ const { bddUser } = require("../utils/importbdd");
 const { checkParamsId } = require("../CheckInput/checkParamsId");
 
 const getUser = (req, res) => {
-  console.log(req.user);
   console.log(req.user.role);
   res.send({ username: req.user.username, role: req.user.role });
   console.log("auth?" + req.isAuthenticated());

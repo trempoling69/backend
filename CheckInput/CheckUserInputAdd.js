@@ -1,97 +1,112 @@
-const checkuserInputAdd = (req,file, rowbddtype, res, callback) => {
-  let notcheckvalue = new Map([]);
-  let entervalue = new Map([]);
-  let errorLenght = false;
-  let errorType = false;
-  let errorKeyWords = false;
-  let errorNotNull = false;
-  let errorMessage = "";
-  for (var key in rowbddtype) {
-    if(req["photo"] === undefined){
-      if(file != undefined && file != null){
-        entervalue.set('photo', file.filename)
-      }
-    }
-    if ((req[key] == undefined || req[key] === "")) {
-      if(rowbddtype[key]["notNull"]){
-        errorNotNull = true
-        errorMessage = `erreur sur le champs : ""${key}"" il ne peut pas être null dans ${JSON.stringify(req)} \n`;
-      }else{
-          notcheckvalue.set(key, "null");
-      }
-      
-    } else {
-      notcheckvalue.set(key, req[key]);
-    }
-  }
-  for (var key in rowbddtype) {
-    //console.log(req[key]); //Donne le contenue de chaque input
-    if (notcheckvalue.get(key) == "null" && (key ==! "photo")) {
-      entervalue.set(key, "null");
-    }
-    for (var keyy in rowbddtype[key]) {
-      if (errorLenght || errorType || errorKeyWords || errorNotNull) {
-        break;
-      } else {
-        var value = rowbddtype[key][keyy];
-        //console.log(keyy);
-
-        //check Lenght
-        if (
-          keyy == "length" &&
-          notcheckvalue.get(key).length > parseInt(value)
-        ) {
-          errorLenght = true;
-          errorMessage = `erreur sur le champs : ""${key}"" trop long maximum ${value} caractères pour [${notcheckvalue.get("nom")}] \n`;
-        }
-        //Check KeyWord
-        if (
-          keyy == "valeurs" &&
-          (notcheckvalue.get(key) != "null" || entervalue.get(key) != "null")
-        ) {
-          if (value.includes(notcheckvalue.get(key))) {
-          } else {
-            errorKeyWords = true;
-            errorMessage = `erreur sur le champs : ""${key}"" valeurs acceptées [${value}] pour [${notcheckvalue.get("nom")}] \n`;
-          }
-        }
-        //check Type
-        if (value == "int" && entervalue.get(key) != "null") {
-          entervalue.set(
-            key,
-            parseInt(notcheckvalue.get(key))
-          );
-        } else if (value == "float" && entervalue.get(key) != "null") {
-          entervalue.set(
-            key,
-            parseFloat(notcheckvalue.get(key))
-          );
-        } else if (value == "string" && entervalue.get(key) != "null") {
-          console.log(notcheckvalue.get(key));
-          entervalue.set(key, notcheckvalue.get(key).replace(/[<>]/g, ""));
-        } else if (value == "photo"){
-          if(entervalue.get(key) == undefined){
-            entervalue.set(key, notcheckvalue.get(key).replace(/[<>]/g, ""))
-          }
-        }
-        if (
-          (value == "int" || value == "float") &&
-          isNaN(entervalue.get(key))
-        ) {
-          errorType = true;
-          console.log(
-            `erreur sur le champs : ""${key}"" type attendu {${value}} \n`
-          );
-          errorMessage = `erreur sur le champs : ""${key}"" type attendu {${value}} pour  [${notcheckvalue.get("nom")}] \n`;
-        }
-      }
-    }
-  }
-  if (errorKeyWords || errorLenght || errorType || errorNotNull) {
-    res.write(errorMessage);
-    return true;
-  } else {
-    callback(entervalue);
-  }
+const cleanedValue = (value) => {
+  const cleanedValue = value.replace(/[<>]/g, "").trim();
+  return cleanedValue;
 };
+
+const checkuserInputAdd = (plante, file, bddplante, res, callback) => {
+  console.log(plante);
+  let checkValue = new Map([]);
+  let errorMessage = "";
+  for (nomcolonne in bddplante) {
+    if (plante[nomcolonne] == undefined || plante[nomcolonne] === "") {
+      if (bddplante[nomcolonne].notNull === true) {
+        console.log(`${nomcolonne} devrai pas être null`);
+        errorMessage = `${nomcolonne} devrai pas être null`;
+        res.write(errorMessage);
+        return true;
+      } else {
+        checkValue.set(nomcolonne, "null");
+      }
+    } else {
+      checkValue.set(nomcolonne, plante[nomcolonne]);
+    }
+    for (params in bddplante[nomcolonne]) {
+      parametre = bddplante[nomcolonne][params];
+      if (
+        params === "length" &&
+        checkValue.get(nomcolonne).length > parseInt(parametre)
+      ) {
+        console.log(`${nomcolonne} valeur trop grande`);
+        errorMessage = `${nomcolonne} valeur trop grande`;
+        res.write(errorMessage);
+        return true;
+      }
+      if (
+        params === "valeurs" &&
+        !parametre.includes(checkValue.get(nomcolonne))
+      ) {
+        console.log(
+          `${nomcolonne} valeur accepté ${JSON.stringify(
+            parametre
+          )} valeur recu ${cleanedValue(
+            checkValue.get(nomcolonne)
+          )}`
+        );
+        errorMessage = `${nomcolonne} valeur accepté ${JSON.stringify(
+          parametre
+        )} valeur recu ${cleanedValue(
+          checkValue.get(nomcolonne)
+        )}`;
+        res.write(errorMessage);
+        return true;
+      }
+      if (
+        params === "type" &&
+        parametre === "string" &&
+        checkValue.get(nomcolonne) != "null"
+      ) {
+        checkValue.set(nomcolonne, cleanedValue(checkValue.get(nomcolonne)));
+      }
+      if (
+        params === "type" &&
+        parametre === "float" &&
+        checkValue.get(nomcolonne) != "null"
+      ) {
+        if (isNaN(parseFloat(checkValue.get(nomcolonne)))) {
+          console.log(
+            `${nomcolonne} valeur du mauvais type, type attendu ${parametre} valeur recu ${cleanedValue(
+              checkValue.get(nomcolonne)
+            )}`
+          );
+          errorMessage = `${nomcolonne} valeur du mauvais type, type attendu ${parametre} valeur recu ${cleanedValue(
+            checkValue.get(nomcolonne)
+          )}`;
+          res.write(errorMessage);
+          return true;
+        } else {
+          checkValue.set(nomcolonne, parseFloat(checkValue.get(nomcolonne)));
+        }
+      }
+      if (
+        params === "type" &&
+        parametre === "int" &&
+        checkValue.get(nomcolonne) != "null"
+      ) {
+        if (isNaN(parseInt(checkValue.get(nomcolonne)))) {
+          console.log(
+            `${nomcolonne} valeur du mauvais type, type attendu ${parametre} valeur recu ${cleanedValue(
+              checkValue.get(nomcolonne)
+            )}`
+          );
+          errorMessage = `${nomcolonne} valeur du mauvais type, type attendu ${parametre} valeur recu ${cleanedValue(
+            checkValue.get(nomcolonne)
+          )}`;
+          res.write(errorMessage);
+          return true;
+        } else {
+          checkValue.set(nomcolonne, parseInt(checkValue.get(nomcolonne)));
+        }
+      }
+      if (params === "type" && parametre === "photo") {
+        if (plante["photo"] === undefined) {
+          if (file != undefined && file != null) {
+            checkValue.set("photo", file.filename);
+          }
+        }
+      }
+    }
+  }
+  callback(checkValue);
+};
+
 module.exports = checkuserInputAdd;

@@ -3,6 +3,8 @@ const checkLoginInput = require("../CheckInput/CheckUserInputAuth");
 var bcrypt = require("bcryptjs");
 var passport = require("passport");
 require("../middleware/passportConfig")(passport);
+const jwt = require('jsonwebtoken');
+require("dotenv").config();
 
 exports.isLogged = (req, res) => {
   console.log(req.isAuthenticated());
@@ -40,7 +42,7 @@ exports.login = (req, res) => {
     } else if (!data.get("password")) {
       res.json({ success: false, message: "Password was not given" });
     } else {
-      passport.authenticate("local", function (err, user, info) {
+      passport.authenticate("local",  { session: false }, function (err, user, info) {
         if (err) {
           res.json({ success: false, message: err });
         } else {
@@ -50,9 +52,12 @@ exports.login = (req, res) => {
               message: "Username ou password incorrect",
             });
           } else {
-            req.login(user, (err) => {
-              if (err) throw err;
-              res.json({ success: true, message: "Authentication successful" });
+            req.login(user, { session: false }, (err) => {
+              if (err){
+                res.send(err)
+              }
+              const token = jwt.sign({ id:user.id_user }, process.env.JWT_SECRET, {expiresIn : "1d"});
+              res.json({ success: true, message: "Authentication successful", token });
             });
           }
         }

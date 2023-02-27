@@ -24,25 +24,27 @@ const importExcel = (req, res) => {
   function logToFile(filePath, message) {
     const timestamp = new Date().toLocaleString("fr-FR");
     const logMessage = `${timestamp}: ${message}\n`;
-    fs.writeFileSync(filePath, logMessage, {flag: 'a'})
+    fs.writeFileSync(filePath, logMessage, { flag: "a" });
   }
   uploadxlsx(req, res, (err) => {
+    fs.writeFileSync("./logs.txt", "Logs import XLSX \n");
     if (err instanceof multer.MulterError) {
-      res.send(err.code);
+      logToFile("./logs.txt", `erreur ${err.code}`);
+      res.download("./logs.txt");
     } else if (err) {
-      res.send(err);
+      logToFile("./logs.txt", `erreur ${err}`);
+      res.download("./logs.txt");
     } else {
       if (req.file == undefined) {
         res.send("Aucun fichier envoyé");
       } else {
-        fs.writeFileSync('./logs.txt', 'Logs import XLSX \n')
         let buffer = req.file.buffer;
         importxlsx(buffer, (object) => {
           let promises = [];
           UtilSheetName.map((name) => {
             if (object[name] == undefined) {
               console.log(`La sheet ${name} n'existe pas`);
-              logToFile('./logs.txt', `La sheet ${name} n'existe pas`)
+              logToFile("./logs.txt", `La sheet ${name} n'existe pas`);
             } else {
               object[name].map((plante, index) => {
                 let promise = new Promise((resolve, reject) => {
@@ -92,13 +94,18 @@ const importExcel = (req, res) => {
                                 .then((result) => {
                                   resolve();
                                   nombreCreation++;
-                                  logToFile('./logs.txt', `Plante ${planteCheck.get("nom")} ajoutée`)
-                                  
+                                  logToFile(
+                                    "./logs.txt",
+                                    `Plante ${planteCheck.get("nom")} ajoutée`
+                                  );
                                 })
                                 .catch((err) => {
-                                  logToFile('./logs.txt', `Erreur de l'ajout de ${planteCheck.get(
-                                    "nom"
-                                  )} erreur : ${err}`)
+                                  logToFile(
+                                    "./logs.txt",
+                                    `Erreur de l'ajout de ${planteCheck.get(
+                                      "nom"
+                                    )} erreur : ${err}`
+                                  );
                                   reject(err);
                                 });
                             } else {
@@ -150,10 +157,13 @@ const importExcel = (req, res) => {
                                   .then((result) => {
                                     //RAPPORT MODIFICATION
                                     nombreModification++;
-                                    logToFile('./logs.txt', `Plante ${planteCheck.get(
-                                      "nom"
-                                    )} modifiée`)
-                                    
+                                    logToFile(
+                                      "./logs.txt",
+                                      `Plante ${planteCheck.get(
+                                        "nom"
+                                      )} modifiée`
+                                    );
+
                                     resolve();
                                   })
                                   .catch((err) => {
@@ -177,11 +187,23 @@ const importExcel = (req, res) => {
           });
           Promise.all(promises)
             .then(() => {
-              logToFile('./logs.txt', `##########################################`)
-              logToFile('./logs.txt', `Traitement terminé avec succès`)
-              logToFile('./logs.txt', `Nombre de plante en double ${nombreDouble}`)
-              logToFile('./logs.txt', `Nombre de plante créée ${nombreCreation}`)
-              logToFile('./logs.txt', `Nombre de plante modifiée ${nombreModification}`)
+              logToFile(
+                "./logs.txt",
+                `##########################################`
+              );
+              logToFile("./logs.txt", `Traitement terminé avec succès`);
+              logToFile(
+                "./logs.txt",
+                `Nombre de plante en double ${nombreDouble}`
+              );
+              logToFile(
+                "./logs.txt",
+                `Nombre de plante créée ${nombreCreation}`
+              );
+              logToFile(
+                "./logs.txt",
+                `Nombre de plante modifiée ${nombreModification}`
+              );
               res.download("./logs.txt");
             })
             .catch((err) => {
@@ -196,5 +218,5 @@ const importExcel = (req, res) => {
 
 module.exports = {
   exportationxlsx,
-  importExcel
-}
+  importExcel,
+};
