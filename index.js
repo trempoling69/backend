@@ -1,18 +1,21 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const bodyParser = require("body-parser");
-const multer = require("multer");
-const fs = require("fs");
-const sequelize = require("sequelize");
+const rateLimit = require("express-rate-limit");
+
+//*ROUTES
+
+const plante_routes = require("./routes/plante");
+const excel_routes = require("./routes/excel");
+const info_routes = require("./routes/stats");
+const user_routes = require("./routes/user")
 
 //!login
 var passport = require("passport");
-var passportLocal = require("passport-local").Strategy;
-var bcrypt = require("bcryptjs");
 var cookieParser = require("cookie-parser");
 var session = require("express-session");
 require("dotenv").config();
+
 //------------------------------------------GESTION BASE DE DONNEE------------------------------------------------------
 
 var con = require("./db/conn");
@@ -28,13 +31,16 @@ sequelizeconn
   });
 
 //? Gestion model bdd
-const { Op } = require("sequelize");
 const model = require("./db/model");
-const User = model.User;
 const Quiz = model.Quiz;
 
 //------------------------------------------------------FIN GESTION BASE DE DONNEE-------------------------------------------------
-
+const limiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 heure
+  max: 3000, // limite à 30 requêtes par heure
+  message: "Trop de requêtes de cette adresse IP, veuillez réessayer plus tard",
+});
+app.use(limiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
@@ -64,116 +70,37 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
-
 //!end login use
 const islogg = (req, res, next) => {
   if (req.user) {
     next();
   } else {
-    return res.status(401).json({ message: "la fonction t'as queblo relou" });
+    return res.status(401).send("connexion nécessaire");
   }
 };
-//!login
 
-const checkLoginInput = require("./CheckInput/CheckUserInputAuth");
-app.post("/login", (req, res) => {
-  checkLoginInput(req, res, (data) => {
-    req.body.username = data.get("username");
-    req.body.password = data.get("password");
-    console.log(req.body.username);
-    if (!data.get("username")) {
-      res.json({ success: false, message: "Username was not given" });
-    } else if (!data.get("password")) {
-      res.json({ success: false, message: "Password was not given" });
-    } else {
-      passport.authenticate("local", function (err, user, info) {
-        if (err) {
-          res.json({ success: false, message: err });
-        } else {
-          if (!user) {
-            res.json({
-              success: false,
-              message: "Username ou password incorrect",
-            });
-          } else {
-            req.login(user, (err) => {
-              if (err) throw err;
-              res.json({ success: true, message: "Authentication successful" });
-            });
-          }
-        }
-      })(req, res);
-    }
-  });
-});
-
-//!register
-app.post("/register", islogg, (req, res) => {
-  checkLoginInput(req, res, (data) => {
-    User.count({ where: { username: data.get("username") } }).then(
-      async (count) => {
-        if (count != 0) {
-          res.send("useralready exist");
-        } else {
-          const hashedpassword = await bcrypt.hash(data.get("password"), 10);
-          User.create({
-            username: data.get("username"),
-            password: hashedpassword,
-          }).then(() => {
-            res.send("user created !");
-          });
-        }
-      }
-    );
-  });
-});
-
+const isChef = (req, res, next) => {
+  if (req.user.role == "chef") {
+    next();
+  } else {
+    return res.status(401).send("Pas autorisé");
+  }
+};
 //!---------------------------------------------------END LOGIN HANDLER------------------------------------------------------------
 
 //------------------------------------------------------API ROUTES----------------------------------------------------------------
-//*lien basique api
-//requete GET
 
-app.get("/islogged", (req, res) => {
-  console.log(req.isAuthenticated());
-  res.send(req.isAuthenticated());
-});
+const controllerAuth = require("./controllers/controllerAuth");
+app.post("/login", controllerAuth.login);
+app.post("/register", islogg, controllerAuth.register);
+app.get("/islogged", controllerAuth.isLogged);
 
-const controllerUser = require("./controllers/user/controllerUser")
-app.get("/user", islogg, controllerUser.getUser);
+app.use('/api', islogg)
+app.use('/api/user', user_routes)
+app.use("/api/stats", info_routes);
+app.use("/api/plante", plante_routes);
+app.use("/api/excel", excel_routes);
 
-app.get("/allusers", islogg, controllerUser.getAllUser);
-
-const controllerInfo = require('./controllers/info/controllerInfo')
-app.get("/", controllerInfo.defaultLink);
-
-app.get("/api/stats", islogg, controllerInfo.stats);
-
-//*renvoie toutes les plantes
-const controllerPlante = require('./controllers/plante/controllerPlante')
-app.get("/api/products", islogg, controllerPlante.allPlantes);
-
-//*renvoie une plante en fonction de son ID
-app.get("/api/products/:id", islogg, controllerPlante.planteById);
-
-//*renvoie un export en excel
-const controllerExcel = require('./controllers/excel/controllerExcel')
-app.get("/api/exportxlsx", islogg, controllerExcel.exportationxlsx);
-
-//requete POST
-//*permet d'envoyer un excel vers la bdd
-app.post("/api/importxlsx", islogg, controllerExcel.importationxlsx)
-
-//*permet d'enregistrer une nouvelle plante
-app.post("/api/insertplante", islogg, controllerPlante.insertPlante);
-
-//* permet de modifier une plante
-app.post("/api/modifplante", islogg, controllerPlante.modifPlante);
-
-app.post("/api/toggledispo", islogg, controllerPlante.toggleDispo);
-//requete DELETE
-//*permet de supprimer une plante
-app.delete("/api/supprimerplante/:id", islogg, controllerPlante.suppPlante);
 
 //ROUTE TEST POUR UNE AUTRE APPLICATION
 app.get("/api/quiz/getall", (req, res) => {
@@ -181,6 +108,14 @@ app.get("/api/quiz/getall", (req, res) => {
   Quiz.findAll().then((quiz) => {
     res.json(quiz);
   });
+});
+app.get("/", (req, res) => {
+  res.send([
+    {
+      title: "API ROUGY",
+      message: "Bienvenue sur l'api privé de RougyHorticulure",
+    },
+  ]);
 });
 //----------------------------------------------------END API ROUTES--------------------------------------------------------
 

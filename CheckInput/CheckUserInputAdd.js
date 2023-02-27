@@ -1,4 +1,4 @@
-const checkuserInputAdd = (req, rowbddtype, res, callback) => {
+const checkuserInputAdd = (req,file, rowbddtype, res, callback) => {
   let notcheckvalue = new Map([]);
   let entervalue = new Map([]);
   let errorLenght = false;
@@ -7,12 +7,17 @@ const checkuserInputAdd = (req, rowbddtype, res, callback) => {
   let errorNotNull = false;
   let errorMessage = "";
   for (var key in rowbddtype) {
-    if (req[key] == undefined || req[key] === "") {
+    if(req["photo"] === undefined){
+      if(file != undefined && file != null){
+        entervalue.set('photo', file.filename)
+      }
+    }
+    if ((req[key] == undefined || req[key] === "")) {
       if(rowbddtype[key]["notNull"]){
         errorNotNull = true
         errorMessage = `erreur sur le champs : ""${key}"" il ne peut pas être null dans ${JSON.stringify(req)} \n`;
       }else{
-        notcheckvalue.set(key, "null");
+          notcheckvalue.set(key, "null");
       }
       
     } else {
@@ -21,7 +26,7 @@ const checkuserInputAdd = (req, rowbddtype, res, callback) => {
   }
   for (var key in rowbddtype) {
     //console.log(req[key]); //Donne le contenue de chaque input
-    if (notcheckvalue.get(key) == "null") {
+    if (notcheckvalue.get(key) == "null" && (key ==! "photo")) {
       entervalue.set(key, "null");
     }
     for (var keyy in rowbddtype[key]) {
@@ -62,9 +67,13 @@ const checkuserInputAdd = (req, rowbddtype, res, callback) => {
             parseFloat(notcheckvalue.get(key))
           );
         } else if (value == "string" && entervalue.get(key) != "null") {
+          console.log(notcheckvalue.get(key));
           entervalue.set(key, notcheckvalue.get(key).replace(/[<>]/g, ""));
+        } else if (value == "photo"){
+          if(entervalue.get(key) == undefined){
+            entervalue.set(key, notcheckvalue.get(key).replace(/[<>]/g, ""))
+          }
         }
-
         if (
           (value == "int" || value == "float") &&
           isNaN(entervalue.get(key))

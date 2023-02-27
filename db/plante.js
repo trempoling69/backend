@@ -126,8 +126,14 @@ module.exports = (sequelize, DataTypes) => {
         catchPhrase:{
             type: DataTypes.STRING(200),
             allowNull : true,
+        },
+        hashPlante:{
+            type: DataTypes.STRING(100),
+            allowNull:false,
+            validate:{
+                notEmpty:true,
+            }
         }
-
     }, {
         timestamps:false
     })

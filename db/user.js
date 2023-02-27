@@ -26,6 +26,14 @@ module.exports = (sequelize, DataTypes) => {
         lastConn:{
             type: DataTypes.STRING,
             allowNull:true
+        },
+        role: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            defaultValue : "basique",
+            validate:{
+                notEmpty:true,
+            }
         }
     }, {
         timestamps:true

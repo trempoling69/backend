@@ -1,0 +1,6 @@
+Logs import XLSX 
+27/02/2023, 11:14:34: ##########################################
+27/02/2023, 11:14:34: Traitement terminé avec succès
+27/02/2023, 11:14:34: Nombre de plante en double 275
+27/02/2023, 11:14:34: Nombre de plante créée 0
+27/02/2023, 11:14:34: Nombre de plante modifiée 0
