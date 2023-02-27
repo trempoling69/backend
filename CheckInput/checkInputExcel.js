@@ -18,7 +18,7 @@ exports.checkInputExcel = (plante, bddplante, index, filereport,resolve, callbac
       if (bddplante[nomcolonne].notNull === true) {
         console.log(`${nomcolonne} devrai pas être null ligne ${index}`);
         //ECRIRE QUI FAUT PAS DE NULL ICI
-        filereport('./logs.txt',`${nomcolonne} devrai pas être null ligne ${index}`)
+        filereport('./logs/logs.txt',`${nomcolonne} devrai pas être null ligne ${index}`)
         resolve()
         //JUMP SANS CALLBACK
         return;
@@ -34,7 +34,7 @@ exports.checkInputExcel = (plante, bddplante, index, filereport,resolve, callbac
         params === "length" &&
         checkValue.get(nomcolonne).length > parseInt(parametre)
       ) {
-        filereport('./logs.txt',`${nomcolonne} valeur trop grande pour la ligne ${index}`)
+        filereport('./logs/logs.txt',`${nomcolonne} valeur trop grande pour la ligne ${index}`)
         console.log(`${nomcolonne} valeur trop grande pour la ligne ${index}`);
         resolve()
         return;
@@ -43,7 +43,7 @@ exports.checkInputExcel = (plante, bddplante, index, filereport,resolve, callbac
         params === "valeurs" &&
         !parametre.includes(checkValue.get(nomcolonne))
       ) {
-        filereport('./logs.txt',`${nomcolonne} valeur accepté ${JSON.stringify(
+        filereport('./logs/logs.txt',`${nomcolonne} valeur accepté ${JSON.stringify(
           parametre
         )} pour la ligne ${index} valeur recu ${cleanedValue(checkValue.get(nomcolonne))}`)
 
@@ -68,7 +68,7 @@ exports.checkInputExcel = (plante, bddplante, index, filereport,resolve, callbac
         checkValue.get(nomcolonne) != "null"
       ) {
         if (isNaN(parseFloat(checkValue.get(nomcolonne)))) {
-          filereport('./logs.txt', `${nomcolonne} valeur du mauvais type, type attendu ${parametre} pour la ligne ${index} valeur recu ${cleanedValue(
+          filereport('./logs/logs.txt', `${nomcolonne} valeur du mauvais type, type attendu ${parametre} pour la ligne ${index} valeur recu ${cleanedValue(
             checkValue.get(nomcolonne)
           )}`)
 
@@ -89,7 +89,7 @@ exports.checkInputExcel = (plante, bddplante, index, filereport,resolve, callbac
         checkValue.get(nomcolonne) != "null"
       ) {
         if (isNaN(parseInt(checkValue.get(nomcolonne)))) {
-          filereport('./logs.txt',`${nomcolonne} valeur du mauvais type, type attendu ${parametre} pour la ligne ${index} valeur recu ${cleanedValue(
+          filereport('./logs/logs.txt',`${nomcolonne} valeur du mauvais type, type attendu ${parametre} pour la ligne ${index} valeur recu ${cleanedValue(
             checkValue.get(nomcolonne)
           )}`)
           

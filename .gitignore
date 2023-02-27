@@ -5,3 +5,5 @@ images
 *.env
 .env
 logs.txt
+*.txt
+logs

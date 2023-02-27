@@ -25,3 +25,13 @@ dev en Node.js avec une bdd en MySQL
 - Vérification des inputs utilisateurs avant leur traitement
 - Correction de nombreux bugs
 - Gestion d'une partie des erreur faisant crash le serveur 
+
+### update 27/02
+
+- Mise en place d'un système d'authentification par JWT
+- Mise en place de différent middleware de sécurité
+- fichier log pour les importation excel qui regroupe les erreurs et réussite
+- Réorganisation total du server
+- gros nettoyage
+- Ajout du hash de chaque plante dans la bdd pour savoir si elle a été modifier sur excel
+- Gestion des erreurs de saisie sur le excel non bloquante, le reste s'importe
