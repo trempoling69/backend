@@ -12,14 +12,14 @@ require("dotenv").config();
 const { verifyJWT } = require("./middleware/checkJWT");
 
 //*ROUTES
-
 const plante_routes = require("./routes/plante");
 const excel_routes = require("./routes/excel");
 const info_routes = require("./routes/stats");
 const user_routes = require("./routes/user");
+const quiz_routes = require("./routes/quiz");
+const gestionquiz_routes = require("./routes/modifQuiz");
 
 //------------------------------------------GESTION BASE DE DONNEE------------------------------------------------------
-
 var con = require("./db/conn");
 var sequelizeconn = con.sequelizeconn;
 
@@ -31,10 +31,6 @@ sequelizeconn
   .catch((error) => {
     console.error("Unable to connect to the database: ", error);
   });
-
-//? Gestion model bdd
-const model = require("./db/model");
-const Quiz = model.Quiz;
 
 //------------------------------------------------------FIN GESTION BASE DE DONNEE-------------------------------------------------
 //*CONFIG SERVER
@@ -50,37 +46,32 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/images", express.static("images"));
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "*",
   })
 );
 
 //------------------------------------------------------API ROUTES----------------------------------------------------------------
 
+//*ROUTE CONNEXION ET INSCRIPTION
 const controllerAuth = require("./controllers/controllerAuth");
 app.post("/login", controllerAuth.login);
 app.post("/register", verifyJWT, controllerAuth.register);
-app.get("/islogged", controllerAuth.isLogged);
+app.get("/islogged", verifyJWT, controllerAuth.isLogged);
 
+//*ROUTE GESTION API
 app.use("/api", verifyJWT);
 app.use("/api/user", user_routes);
 app.use("/api/stats", info_routes);
 app.use("/api/plante", plante_routes);
 app.use("/api/excel", excel_routes);
+app.use("/api/Gestionquiz", gestionquiz_routes);
 
-//ROUTE TEST POUR UNE AUTRE APPLICATION
-app.get("/quiz/getall", (req, res) => {
-  console.log(req.user);
-  Quiz.findAll().then((quiz) => {
-    res.json(quiz);
-  });
-});
+//*ROUTE POUR LE QUIZ
+app.use("/quiz", quiz_routes);
+
+//*ROUTE BASIQUE
 app.get("/", (req, res) => {
-  res.send([
-    {
-      title: "API ROUGY",
-      message: "Bienvenue sur l'api privé de RougyHorticulure",
-    },
-  ]);
+  res.send("Bienvenue sur l'api privé de RougyHorticulure");
 });
 //----------------------------------------------------END API ROUTES--------------------------------------------------------
 

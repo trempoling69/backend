@@ -8,7 +8,7 @@ require("dotenv").config();
 
 exports.isLogged = (req, res) => {
   console.log(req.isAuthenticated());
-  res.send(req.isAuthenticated());
+  res.send(true);
 };
 
 exports.register = (req, res) => {

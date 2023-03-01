@@ -35,3 +35,8 @@ dev en Node.js avec une bdd en MySQL
 - gros nettoyage
 - Ajout du hash de chaque plante dans la bdd pour savoir si elle a été modifier sur excel
 - Gestion des erreurs de saisie sur le excel non bloquante, le reste s'importe
+
+### update 01/03
+
+- Mise en place des principales route pour la gestion du quiz 
+- Model de bdd pour les tables Question et Reponse + gestion clés étrangères
