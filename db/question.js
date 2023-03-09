@@ -55,6 +55,10 @@ module.exports = (sequelize, DataTypes) => {
                 key: 'id_reponse'
               }
         },
+        start : {
+            type : DataTypes.STRING, 
+            allowNull: true
+        }
     }, {
         timestamps : false
     })

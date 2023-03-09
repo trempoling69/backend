@@ -5,7 +5,7 @@
  **En cas de problème il écrit dans un fichier txt
  **l'erreur de la ligne, si tout vas bien il envoie
  **un object Map à une callback
- */
+**/
 const cleanedValue = (value) => {
   const cleanedValue = value.replace(/[<>]/g, "").trim();
   return cleanedValue;

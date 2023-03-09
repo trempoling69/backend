@@ -1,10 +1,39 @@
 const model = require("../db/model");
-const Quiz = model.Quiz;
+const Question = model.Question;
+const Reponse = model.Reponse;
 const Plante = model.Plante;
 
 const getQR = (req, res) => {
-  Quiz.findAll().then((quiz) => {
-    res.json(quiz);
+  Question.findAll({
+    attributes: ["id_question", "texte_question", "start"],
+    include: [
+      {
+        model: Reponse,
+        as: "Reponse1",
+      },
+      {
+        model: Reponse,
+        as: "Reponse2",
+      },
+      {
+        model: Reponse,
+        as: "Reponse3",
+      },
+      {
+        model: Reponse,
+        as: "Reponse4",
+      },
+      {
+        model: Reponse,
+        as: "Reponse5",
+      },
+      {
+        model: Reponse,
+        as: "Reponse6",
+      },
+    ],
+  }).then((question) => {
+    res.json(question);
   });
 };
 

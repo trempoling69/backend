@@ -94,10 +94,6 @@ const importExcel = (req, res) => {
                                 .then((result) => {
                                   resolve();
                                   nombreCreation++;
-                                  logToFile(
-                                    "./logs/logs.txt",
-                                    `Plante ${planteCheck.get("nom")} ajoutée`
-                                  );
                                 })
                                 .catch((err) => {
                                   logToFile(
@@ -112,9 +108,6 @@ const importExcel = (req, res) => {
                               if (hashPlantes === plante.hashPlante) {
                                 resolve();
                                 nombreDouble++;
-                                console.log(
-                                  planteCheck.get("nom") + "  même que dans bdd"
-                                );
                               } else {
                                 bddPlante()
                                   .update(
@@ -157,13 +150,6 @@ const importExcel = (req, res) => {
                                   .then((result) => {
                                     //RAPPORT MODIFICATION
                                     nombreModification++;
-                                    logToFile(
-                                      "./logs/logs.txt",
-                                      `Plante ${planteCheck.get(
-                                        "nom"
-                                      )} modifiée`
-                                    );
-
                                     resolve();
                                   })
                                   .catch((err) => {

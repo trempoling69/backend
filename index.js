@@ -36,10 +36,13 @@ sequelizeconn
 //*CONFIG SERVER
 const limiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 heure
-  max: 3000, // limite à 30 requêtes par heure
+  max: 3000, // limite à ce nombre de requêtes par heure
   message: "Trop de requêtes de cette adresse IP, veuillez réessayer plus tard",
 });
+app.use(helmet());
+app.disable('x-powered-by');
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
+app.use(helmet.frameguard({ action: "deny" }));
 app.use(limiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -49,7 +52,6 @@ app.use(
     origin: "*",
   })
 );
-
 //------------------------------------------------------API ROUTES----------------------------------------------------------------
 
 //*ROUTE CONNEXION ET INSCRIPTION
@@ -73,6 +75,8 @@ app.use("/quiz", quiz_routes);
 app.get("/", (req, res) => {
   res.send("Bienvenue sur l'api privé de RougyHorticulure");
 });
+
+
 //----------------------------------------------------END API ROUTES--------------------------------------------------------
 
 //demarrage server
