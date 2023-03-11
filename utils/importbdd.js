@@ -1,16 +1,22 @@
-const model = require("../db/model");
+const models = require("../models/index");
 
-exports.bddPlante = () => {
-  return model.Plante;
+exports.Plante = () => {
+  return models.Plante;
 };
 
-exports.bddUser = () => {
-  return model.User;
+exports.User = () => {
+  return models.User;
 };
 
+exports.Question = () => {
+  return models.Question;
+}
+exports.Reponse = () => {
+  return models.Reponse;
+}
 exports.configBdd = () => {
   let configDonneeBdd = {
-    id_plantes: {
+    id: {
       type: "int"
     },
     nom: {

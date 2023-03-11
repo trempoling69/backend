@@ -1,9 +1,9 @@
-const { bddUser } = require("../utils/importbdd");
+const { User } = require("../utils/importbdd");
 const checkLoginInput = require("../CheckInput/CheckUserInputAuth");
 var bcrypt = require("bcryptjs");
 var passport = require("passport");
 require("../middleware/passportConfig")(passport);
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 exports.isLogged = (req, res) => {
@@ -13,14 +13,14 @@ exports.isLogged = (req, res) => {
 
 exports.register = (req, res) => {
   checkLoginInput(req, res, (data) => {
-    bddUser()
+    User()
       .count({ where: { username: data.get("username") } })
       .then(async (count) => {
         if (count != 0) {
           res.send("useralready exist");
         } else {
           const hashedpassword = await bcrypt.hash(data.get("password"), 10);
-          bddUser()
+          User()
             .create({
               username: data.get("username"),
               password: hashedpassword,
@@ -42,26 +42,38 @@ exports.login = (req, res) => {
     } else if (!data.get("password")) {
       res.json({ success: false, message: "Password was not given" });
     } else {
-      passport.authenticate("local",  { session: false }, function (err, user, info) {
-        if (err) {
-          res.json({ success: false, message: err });
-        } else {
-          if (!user) {
-            res.json({
-              success: false,
-              message: "Username ou password incorrect",
-            });
+      passport.authenticate(
+        "local",
+        { session: false },
+        function (err, user, info) {
+          if (err) {
+            res.json({ success: false, message: err });
           } else {
-            req.login(user, { session: false }, (err) => {
-              if (err){
-                res.send(err)
-              }
-              const token = jwt.sign({ id:user.id_user }, process.env.JWT_SECRET, {expiresIn : "1d"});
-              res.json({ success: true, message: "Authentication successful", token });
-            });
+            if (!user) {
+              res.json({
+                success: false,
+                message: "Username ou password incorrect",
+              });
+            } else {
+              req.login(user, { session: false }, (err) => {
+                if (err) {
+                  res.send(err);
+                }
+                const token = jwt.sign(
+                  { id: user.id },
+                  process.env.JWT_SECRET,
+                  { expiresIn: "1d" }
+                );
+                res.json({
+                  success: true,
+                  message: "Authentication successful",
+                  token,
+                });
+              });
+            }
           }
         }
-      })(req, res);
+      )(req, res);
     }
   });
 };

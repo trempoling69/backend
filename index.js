@@ -20,18 +20,14 @@ const quiz_routes = require("./routes/quiz");
 const gestionquiz_routes = require("./routes/modifQuiz");
 
 //------------------------------------------GESTION BASE DE DONNEE------------------------------------------------------
-var con = require("./db/conn");
-var sequelizeconn = con.sequelizeconn;
-
-sequelizeconn
-  .authenticate()
-  .then(() => {
-    console.log("Connection has been established successfully.");
-  })
-  .catch((error) => {
-    console.error("Unable to connect to the database: ", error);
-  });
-
+var models = require("./models/index");
+models.Plante.sync();
+models.User.sync();
+models.Reponse.sync();
+models.Question.sync();
+// models.sequelize.sync().then(()=>{
+//   console.log('bdd synchorinise');
+// })
 //------------------------------------------------------FIN GESTION BASE DE DONNEE-------------------------------------------------
 //*CONFIG SERVER
 const limiter = rateLimit({
@@ -40,7 +36,7 @@ const limiter = rateLimit({
   message: "Trop de requêtes de cette adresse IP, veuillez réessayer plus tard",
 });
 app.use(helmet());
-app.disable('x-powered-by');
+app.disable("x-powered-by");
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(helmet.frameguard({ action: "deny" }));
 app.use(limiter);
@@ -53,7 +49,6 @@ app.use(
   })
 );
 //------------------------------------------------------API ROUTES----------------------------------------------------------------
-
 //*ROUTE CONNEXION ET INSCRIPTION
 const controllerAuth = require("./controllers/controllerAuth");
 app.post("/login", controllerAuth.login);
@@ -76,10 +71,10 @@ app.get("/", (req, res) => {
   res.send("Bienvenue sur l'api privé de RougyHorticulure");
 });
 
-
 //----------------------------------------------------END API ROUTES--------------------------------------------------------
 
 //demarrage server
+
 app.listen(process.env.DEV_PORT, () => {
   console.log(`running on port ${process.env.DEV_PORT}`);
 });

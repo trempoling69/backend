@@ -1,4 +1,4 @@
-const { bddPlante, configBdd } = require("../utils/importbdd");
+const { Plante, configBdd } = require("../utils/importbdd");
 const exportxlsx = require("../excelRequest/exportxlsx");
 const importxlsx = require("../excelRequest/importxlsx");
 const UtilSheetName = ["vivaces", "annuelles", "arbustes"];
@@ -10,7 +10,7 @@ const { checkInputExcel } = require("../CheckInput/checkInputExcel");
 const { Op } = require("sequelize");
 
 const exportationxlsx = (req, res) => {
-  bddPlante()
+  Plante()
     .findAll()
     .then((plantes) => {
       exportxlsx(res, plantes, UtilSheetName);
@@ -43,7 +43,6 @@ const importExcel = (req, res) => {
           let promises = [];
           UtilSheetName.map((name) => {
             if (object[name] == undefined) {
-              console.log(`La sheet ${name} n'existe pas`);
               logToFile("./logs/logs.txt", `La sheet ${name} n'existe pas`);
             } else {
               object[name].map((plante, index) => {
@@ -52,64 +51,87 @@ const importExcel = (req, res) => {
                     plante,
                     configBdd(),
                     index,
+                    name,
                     logToFile,
                     resolve,
                     (planteCheck) => {
                       createHashPlante(planteCheck, (hashPlantes) => {
-                        bddPlante()
+                        Plante()
                           .findOne({
                             logging: false,
                             where: {
-                              id_plantes: {
-                                [Op.eq]: planteCheck.get("id_plantes"),
+                              id: {
+                                [Op.eq]: planteCheck.get("id"),
                               },
                             },
                           })
                           .then((plante) => {
                             if (plante === null) {
-                              bddPlante()
-                                .create({
-                                  nom: planteCheck.get("nom"),
-                                  description: planteCheck.get("description"),
-                                  couleur_dispo:
-                                    planteCheck.get("couleur_dispo"),
-                                  type: planteCheck.get("type"),
-                                  feuillage: planteCheck.get("feuillage"),
-                                  collection: planteCheck.get("collection"),
-                                  exposition: planteCheck.get("exposition"),
-                                  hauteur: planteCheck.get("hauteur"),
-                                  mois_floraison:
-                                    planteCheck.get("mois_floraison"),
-                                  periode_floraison:
-                                    planteCheck.get("periode_floraison"),
-                                  besoin_eau: planteCheck.get("besoin_eau"),
-                                  photo: planteCheck.get("photo"),
-                                  dispo: planteCheck.get("dispo"),
-                                  prix: planteCheck.get("prix"),
-                                  emplacement: planteCheck.get("emplacement"),
-                                  quantiteProd: planteCheck.get("quantiteProd"),
-                                  catchPhrase: planteCheck.get("catchPhrase"),
-                                  hashPlante: hashPlantes,
+                              Plante()
+                                .findOne({
+                                  where: {
+                                    hashPlante: {
+                                      [Op.eq]: hashPlantes,
+                                    },
+                                  },
                                 })
-                                .then((result) => {
-                                  resolve();
-                                  nombreCreation++;
-                                })
-                                .catch((err) => {
-                                  logToFile(
-                                    "./logs/logs.txt",
-                                    `Erreur de l'ajout de ${planteCheck.get(
-                                      "nom"
-                                    )} erreur : ${err}`
-                                  );
-                                  reject(err);
+                                .then((plante) => {
+                                  if (plante === null) {
+                                    Plante()
+                                      .create({
+                                        nom: planteCheck.get("nom"),
+                                        description:
+                                          planteCheck.get("description"),
+                                        couleur_dispo:
+                                          planteCheck.get("couleur_dispo"),
+                                        type: planteCheck.get("type"),
+                                        feuillage: planteCheck.get("feuillage"),
+                                        collection:
+                                          planteCheck.get("collection"),
+                                        exposition:
+                                          planteCheck.get("exposition"),
+                                        hauteur: planteCheck.get("hauteur"),
+                                        mois_floraison:
+                                          planteCheck.get("mois_floraison"),
+                                        periode_floraison:
+                                          planteCheck.get("periode_floraison"),
+                                        besoin_eau:
+                                          planteCheck.get("besoin_eau"),
+                                        photo: planteCheck.get("photo"),
+                                        dispo: planteCheck.get("dispo"),
+                                        prix: planteCheck.get("prix"),
+                                        emplacement:
+                                          planteCheck.get("emplacement"),
+                                        quantiteProd:
+                                          planteCheck.get("quantiteProd"),
+                                        catchPhrase:
+                                          planteCheck.get("catchPhrase"),
+                                        hashPlante: hashPlantes,
+                                      })
+                                      .then((result) => {
+                                        resolve();
+                                        nombreCreation++;
+                                      })
+                                      .catch((err) => {
+                                        logToFile(
+                                          "./logs/logs.txt",
+                                          `Erreur de l'ajout de ${planteCheck.get(
+                                            "nom"
+                                          )} erreur : ${err}`
+                                        );
+                                        reject(err);
+                                      });
+                                  }else{
+                                    nombreDouble++;
+                                    resolve();
+                                  }
                                 });
                             } else {
                               if (hashPlantes === plante.hashPlante) {
                                 resolve();
                                 nombreDouble++;
                               } else {
-                                bddPlante()
+                                Plante()
                                   .update(
                                     {
                                       nom: planteCheck.get("nom"),
@@ -140,9 +162,9 @@ const importExcel = (req, res) => {
                                     },
                                     {
                                       where: {
-                                        id_plantes: {
+                                        id: {
                                           [Op.eq]:
-                                            planteCheck.get("id_plantes"),
+                                            planteCheck.get("id"),
                                         },
                                       },
                                     }

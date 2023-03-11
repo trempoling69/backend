@@ -1,4 +1,4 @@
-const { bddUser } = require("../utils/importbdd");
+const { User } = require("../utils/importbdd");
 const { checkParamsId } = require("../CheckInput/checkParamsId");
 
 const getUser = (req, res) => {
@@ -8,13 +8,11 @@ const getUser = (req, res) => {
 };
 
 const getAllUser = (req, res) => {
-  bddUser()
+  User()
     .findAll({
       attributes: [
-        "id_user",
+        "id",
         "username",
-        "createdAt",
-        "updatedAt",
         "lastConn",
         "role",
       ],
@@ -26,18 +24,18 @@ const getAllUser = (req, res) => {
 
 const suppUser = (req, res) => {
   checkParamsId(req, res, (data) => {
-    bddUser()
+    User()
       .findOne({
-        attributes: ["id_user", "role"],
-        where: { id_user: data.get("id") },
+        attributes: ["id", "role"],
+        where: { id: data.get("id") },
       })
       .then((user) => {
         if (user.role == "chef") {
           res.status(400).send("Impossible de supprimer ce role");
         } else {
-          bddUser()
+          User()
             .destroy({
-              where: { id_user: data.get("id") },
+              where: { id: data.get("id") },
             })
             .then(() => {
               res.status(200).send("suppression réussi");

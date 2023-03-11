@@ -1,28 +1,28 @@
-const sequelize = require("sequelize");
-const dbuser = require("./user");
-const dbplantes = require("./plante");
-const dbquiz = require("./quiz");
-const dbquestion = require("./question");
-const dbreponse = require("./reponse");
-var con = require("./conn");
-var sequelizeconn = con.sequelizeconn;
+// const sequelize = require("sequelize");
+// const dbuser = require("./user");
+// const dbplantes = require("./plante");
+// const dbquiz = require("./quiz");
+// const dbquestion = require("./question");
+// const dbreponse = require("./reponse");
+// // var con = require("./conn");
+// // var sequelizeconn = con.sequelizeconn;
 
-const User = dbuser(sequelizeconn, sequelize);
 
-const Plante = dbplantes(sequelizeconn, sequelize);
+// const User = dbuser(sequelizeconn, sequelize);
 
-const Quiz = dbquiz(sequelizeconn, sequelize);
+// const Plante = dbplantes(sequelizeconn, sequelize);
 
-const Question = dbquestion(sequelizeconn, sequelize);
+// const Quiz = dbquiz(sequelizeconn, sequelize);
 
-const Reponse = dbreponse(sequelizeconn, sequelize);
+// const Question = dbquestion(sequelizeconn, sequelize);
 
-Question.belongsTo(Reponse, { foreignKey: 'reponse_1', as: 'Reponse1' });
-Question.belongsTo(Reponse, { foreignKey: 'reponse_2', as: 'Reponse2' });
-Question.belongsTo(Reponse, { foreignKey: 'reponse_3', as: 'Reponse3' });
-Question.belongsTo(Reponse, { foreignKey: 'reponse_4', as: 'Reponse4' });
-Question.belongsTo(Reponse, { foreignKey: 'reponse_5', as: 'Reponse5' });
-Question.belongsTo(Reponse, { foreignKey: 'reponse_6', as: 'Reponse6' });
+// const Reponse = dbreponse(sequelizeconn, sequelize);
 
-module.exports = { User, Plante, Quiz, Question, Reponse };
+// Question.belongsTo(Reponse, { foreignKey: "reponse_1", as: "Reponse1" });
+// Question.belongsTo(Reponse, { foreignKey: "reponse_2", as: "Reponse2" });
+// Question.belongsTo(Reponse, { foreignKey: "reponse_3", as: "Reponse3" });
+// Question.belongsTo(Reponse, { foreignKey: "reponse_4", as: "Reponse4" });
+// Question.belongsTo(Reponse, { foreignKey: "reponse_5", as: "Reponse5" });
+// Question.belongsTo(Reponse, { foreignKey: "reponse_6", as: "Reponse6" });
 
+// module.exports = { User, Plante, Quiz, Question, Reponse };

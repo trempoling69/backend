@@ -1,8 +1,8 @@
-const model = require("../db/model");
-const Question = model.Question;
-const Reponse = model.Reponse;
-const Plante = model.Plante;
-
+// const model = require("../db/model");
+// const Question = model.Question;
+// const Reponse = model.Reponse;
+// const Plante = model.Plante;
+const { Question, Reponse, Plante } = require("../utils/importbdd");
 const getQR = (req, res) => {
   Question.findAll({
     attributes: ["id_question", "texte_question", "start"],
@@ -38,11 +38,11 @@ const getQR = (req, res) => {
 };
 
 const getPlante = (req, res) => {
-    Plante.findAll({
-        attributes : { exclude : ['id_plantes', 'quantiteProd', 'hashPlante']}
-    }).then((plantes) => {
-        res.json(plantes)
-    })
-}
+  Plante.findAll({
+    attributes: { exclude: ["id_plantes", "quantiteProd", "hashPlante"] },
+  }).then((plantes) => {
+    res.json(plantes);
+  });
+};
 
 module.exports = { getQR, getPlante };

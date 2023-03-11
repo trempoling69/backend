@@ -7,3 +7,4 @@ images
 logs.txt
 *.txt
 logs
+/migrations

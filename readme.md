@@ -40,3 +40,13 @@ dev en Node.js avec une bdd en MySQL
 
 - Mise en place des principales route pour la gestion du quiz 
 - Model de bdd pour les tables Question et Reponse + gestion clés étrangères
+
+### update 11/03
+
+- Les erreurs excel ne sont plus bloquante, s'il y a une erreur sur le premier champ il continue 
+à check les autres champs pour indiquer toutes les erreurs mais n'importe pas la ligne
+- Refonte total de l'utilisation de sequelize 
+- Les tables sont maintenant créées automatiquement si elle n'existe pas 
+- Définition de nouveaux models
+- Mise en place des clés étrangères 
+- Définition des bases de données pour les différent environnement DEV / TEST / PROD
