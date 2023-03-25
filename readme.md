@@ -44,7 +44,7 @@ dev en Node.js avec une bdd en MySQL
 ### update 11/03
 
 - Les erreurs excel ne sont plus bloquante, s'il y a une erreur sur le premier champ il continue 
-à check les autres champs pour indiquer toutes les erreurs mais n'importe pas la ligne
+à check les autres champs pour indiquer toutes les erreurs mais n'importe pas la ligne dans la bdd
 - Refonte total de l'utilisation de sequelize 
 - Les tables sont maintenant créées automatiquement si elle n'existe pas 
 - Définition de nouveaux models

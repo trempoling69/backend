@@ -19,6 +19,17 @@ const user_routes = require("./routes/user");
 const quiz_routes = require("./routes/quiz");
 const gestionquiz_routes = require("./routes/modifQuiz");
 
+//-----------------------------------------------HEBERGEMENT-----------------------------------------------------------------------------
+// if (typeof PhusionPassenger !== "undefined") {
+//   PhusionPassenger.configure({ autoInstall: false });
+// }
+// app.use(function (request, response, next) {
+//   if (!request.secure) {
+//     return response.redirect("https://" + request.headers.host + request.url);
+//   }
+
+//   next();
+// });
 //------------------------------------------GESTION BASE DE DONNEE------------------------------------------------------
 var models = require("./models/index");
 models.Plante.sync();
@@ -43,11 +54,23 @@ app.use(limiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/images", express.static("images"));
+const allowedOrigins = [
+  process.env.CORS_ORIGINE_GBDD,
+  process.env.CORS_ORIGINE_QUIZ,
+];
 app.use(
   cors({
-    origin: "*",
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    optionsSuccessStatus: 200,
   })
 );
+
 //------------------------------------------------------API ROUTES----------------------------------------------------------------
 //*ROUTE CONNEXION ET INSCRIPTION
 const controllerAuth = require("./controllers/controllerAuth");
@@ -74,6 +97,13 @@ app.get("/", (req, res) => {
 //----------------------------------------------------END API ROUTES--------------------------------------------------------
 
 //demarrage server
+// if (typeof PhusionPassenger !== "undefined") {
+//   app.listen("passenger");
+// } else {
+//   app.listen(process.env.DEV_PORT, () => {
+//     console.log(`running on port ${process.env.DEV_PORT}`);
+//   });
+// }
 
 app.listen(process.env.DEV_PORT, () => {
   console.log(`running on port ${process.env.DEV_PORT}`);

@@ -64,11 +64,24 @@ exports.login = (req, res) => {
                   process.env.JWT_SECRET,
                   { expiresIn: "1d" }
                 );
-                res.json({
-                  success: true,
-                  message: "Authentication successful",
-                  token,
-                });
+                User()
+                  .update(
+                    {
+                      lastConn: Date.now(),
+                    },
+                    {
+                      where: {
+                        id: user.id,
+                      },
+                    }
+                  )
+                  .then(() => {
+                    res.json({
+                      success: true,
+                      message: "Authentication successful",
+                      token,
+                    });
+                  });
               });
             }
           }

@@ -8,7 +8,7 @@ const checkInputGestionQuiz = (donnee, callback) => {
     "Reponse5",
     "Reponse6",
   ];
-  let type_tri = ["STRICT", "STRING_MULTI", "INT_AVG"];
+  let type_tri = ["STRICT", "STRING_MULTI", "INT_AVG", "AUCUN"];
   checkInput.id_question = parseInt(donnee.id_question);
   if (isNaN(checkInput.id_question)) {
     return;

@@ -12,26 +12,38 @@ module.exports = (sequelize, DataTypes) => {
       Question.belongsTo(models.Reponse, {
         foreignKey: "reponse_1",
         as: "Reponse1",
+        onDelete: "SET NULL",
+        onUpdate: "CASCADE",
       });
       Question.belongsTo(models.Reponse, {
         foreignKey: "reponse_2",
         as: "Reponse2",
+        onDelete: "SET NULL",
+        onUpdate: "CASCADE",
       });
       Question.belongsTo(models.Reponse, {
         foreignKey: "reponse_3",
         as: "Reponse3",
+        onDelete: "SET NULL",
+        onUpdate: "CASCADE",
       });
       Question.belongsTo(models.Reponse, {
         foreignKey: "reponse_4",
         as: "Reponse4",
+        onDelete: "SET NULL",
+        onUpdate: "CASCADE",
       });
       Question.belongsTo(models.Reponse, {
         foreignKey: "reponse_5",
         as: "Reponse5",
+        onDelete: "SET NULL",
+        onUpdate: "CASCADE",
       });
       Question.belongsTo(models.Reponse, {
         foreignKey: "reponse_6",
         as: "Reponse6",
+        onDelete: "SET NULL",
+        onUpdate: "CASCADE",
       });
     }
   }
@@ -41,7 +53,7 @@ module.exports = (sequelize, DataTypes) => {
       reponse_1: {
         type: DataTypes.INTEGER,
         references: {
-          model: 'reponses',
+          model: "reponses",
           key: "id",
         },
       },
