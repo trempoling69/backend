@@ -1,13 +1,18 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const upload = multer();
 
 const {
-  exportationxlsx,
-  importExcel,
-} = require("../controllers/controllerExcel.js");
+  getAllCategory,
+  getAllPriceOfCategory,
+  getAllPrice,
+  createNewPrice,
+} = require('../controllers/controllerGestionPrix');
 
-router.get('/exportxlsx', exportationxlsx)
-router.post('/importxlsx', importExcel)
+router.get('/getAllCategory', getAllCategory);
+router.get('/getAllPrice', getAllPrice);
+router.get('/getprice/:category', getAllPriceOfCategory);
+router.post('/createNewPrice', upload.none(), createNewPrice);
 
-
-module.exports = router
+module.exports = router;

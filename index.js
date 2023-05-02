@@ -34,11 +34,11 @@ const gestionprix_routes = require('./routes/gestionPrix');
 // });
 //------------------------------------------GESTION BASE DE DONNEE------------------------------------------------------
 var models = require('./models/index');
+models.Price.sync();
 models.Plante.sync();
 models.User.sync();
 models.Reponse.sync();
 models.Question.sync();
-models.Price.sync();
 models.Order.sync();
 // models.sequelize.sync().then(()=>{
 //   console.log('bdd synchorinise');
