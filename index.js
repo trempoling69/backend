@@ -20,6 +20,7 @@ const quiz_routes = require('./routes/quiz');
 const gestionquiz_routes = require('./routes/modifQuiz');
 const price_routes = require('./routes/price');
 const order_routes = require('./routes/order');
+const gestionprix_routes = require('./routes/gestionPrix');
 //-----------------------------------------------HEBERGEMENT-----------------------------------------------------------------------------
 // if (typeof PhusionPassenger !== "undefined") {
 //   PhusionPassenger.configure({ autoInstall: false });
@@ -33,11 +34,11 @@ const order_routes = require('./routes/order');
 // });
 //------------------------------------------GESTION BASE DE DONNEE------------------------------------------------------
 var models = require('./models/index');
+models.Price.sync();
 models.Plante.sync();
 models.User.sync();
 models.Reponse.sync();
 models.Question.sync();
-models.Price.sync();
 models.Order.sync();
 // models.sequelize.sync().then(()=>{
 //   console.log('bdd synchorinise');
@@ -85,6 +86,7 @@ app.use('/api/stats', info_routes);
 app.use('/api/plante', plante_routes);
 app.use('/api/excel', excel_routes);
 app.use('/api/Gestionquiz', gestionquiz_routes);
+app.use('/api/gestionprix', gestionprix_routes);
 
 //*ROUTE POUR LE QUIZ
 app.use('/quiz', quiz_routes);

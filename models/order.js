@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Order.init(
     {
-      content: DataTypes.STRING,
+      content: { type: DataTypes.STRING(10000), allowNull: false },
       totalPrice: DataTypes.FLOAT,
     },
     {

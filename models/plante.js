@@ -1,5 +1,5 @@
-"use strict";
-const { Model } = require("sequelize");
+'use strict';
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Plante extends Model {
     /**
@@ -8,7 +8,12 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      Plante.belongsTo(models.Price, {
+        foreignKey: 'prix',
+        as: 'fk_price',
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+      });
     }
   }
   Plante.init(
@@ -46,10 +51,16 @@ module.exports = (sequelize, DataTypes) => {
       dispo: {
         type: DataTypes.STRING,
         validate: {
-          isIn: [["InStock", "OutStock", "null"]],
+          isIn: [['InStock', 'OutStock', 'null']],
         },
       },
-      prix: DataTypes.FLOAT,
+      prix: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: 'prices',
+          key: 'id',
+        },
+      },
       emplacement: DataTypes.STRING,
       quantiteProd: DataTypes.INTEGER,
       catchPhrase: DataTypes.STRING,
@@ -63,7 +74,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "Plante",
+      modelName: 'Plante',
       timestamps: false,
     }
   );
