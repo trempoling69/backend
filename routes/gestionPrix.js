@@ -7,18 +7,29 @@ const {
   getAllCategory,
   getAllPriceOfCategory,
   getAllPrice,
-  createNewPrice,
   getAllCategoryForBP,
   getAllPriceForBP,
   getAllPriceForSpe,
+  modifBasicPrice,
+  addBPToCategory,
+  addNewPriceToNewCat,
+  deleteOnePrice,
 } = require('../controllers/controllerGestionPrix');
 
-router.get('/BP/getAllCategory', getAllCategoryForBP);
-router.get('/BP/getAllPrice', getAllPriceForBP);
-router.get('/other/getAllPrice', getAllPriceForSpe);
+//* BASIC PRICE
+router.get('/BP/getAllCategory', getAllCategoryForBP); //!
+router.get('/BP/getAllPrice', getAllPriceForBP); //!
+router.post('/BP/modifprice', upload.none(), modifBasicPrice); //!
+router.post('/BP/addpriceto/:category', upload.none(), addBPToCategory); //!
+router.post('/BP/createpandcat', upload.none(), addNewPriceToNewCat); //!
+
+//* SPECIFIC PRICE
+router.get('/other/getAllPrice', getAllPriceForSpe); //!
+
+//* GENERAL REQUEST
 router.get('/getAllCategory', getAllCategory);
 router.get('/getAllPrice', getAllPrice);
 router.get('/getprice/:category', getAllPriceOfCategory);
-router.post('/createNewPrice', upload.none(), createNewPrice);
+router.delete('/deleteoneprice/:id', deleteOnePrice);
 
 module.exports = router;

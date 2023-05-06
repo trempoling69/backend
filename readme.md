@@ -53,6 +53,7 @@ dev en Node.js avec une bdd en MySQL
 
 ### update 06/05
 
-- Premières routes pour la gestion des prix
+- Routes CRUD pour la gestion des prix basiques
+- Première routes pour les prix spécifique
 - Model pour la table price
 - Définition de la clé étrangère prix pour chaque plante

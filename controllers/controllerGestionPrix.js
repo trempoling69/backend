@@ -33,6 +33,29 @@ const getAllPriceOfCategory = (req, res) => {
 
 //* REQUETE GESTION DE PRIX BASIQUE
 
+const deleteOnePrice = (req, res) => {
+  Price()
+    .findOne({ where: { id: req.params.id } })
+    .then((price) => {
+      if (price === null) {
+        res.status(400).json('pas de prix qui correspond à cet id');
+        return;
+      }
+      Price()
+        .destroy({ where: { id: req.params.id } })
+        .then(() => {
+          res.status(200).json('ok');
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(500).json('Une erreur est sruvenue lors de la suppression');
+        });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json('Une erreur est sruvenue lors de la suppression');
+    });
+};
 const getAllCategoryForBP = (req, res) => {
   Price()
     .findAll({
@@ -98,75 +121,90 @@ const getAllPriceForBP = (req, res) => {
     });
 };
 
-const createNewPrice = (req, res) => {
+const modifBasicPrice = (req, res) => {
   console.log(req.body);
-  if (req.body.action === 'modification') {
-    if (req.body.category === 'new') {
-      Price()
-        .update(
-          {
-            name: req.body.name,
-            amount: req.body.amount,
-            usualname: req.body.usualname,
-            type: req.body.type,
-            category: req.body.newCategory,
-          },
-          { where: { id: req.body.id } }
-        )
-        .then(() => {
-          res.status(200).send('ok');
-        });
-    } else {
-      Price()
-        .update(
-          {
-            name: req.body.name,
-            amount: req.body.amount,
-            usualname: req.body.usualname,
-            type: req.body.type,
-            category: req.body.category,
-          },
-          { where: { id: req.body.id } }
-        )
-        .then(() => {
-          res.status(200).send('ok');
-        });
-    }
-  } else {
-    if (req.body.category === 'new') {
-      Price()
-        .create({
+  if (req.body.category === 'new') {
+    Price()
+      .update(
+        {
           name: req.body.name,
           amount: req.body.amount,
           usualname: req.body.usualname,
-          type: req.body.type,
           category: req.body.newCategory,
-        })
-        .then(() => {
-          res.status(200).send('ok');
-        });
-    } else {
-      Price()
-        .create({
+        },
+        { where: { id: req.body.id } }
+      )
+      .then(() => {
+        res.status(200).send('ok');
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json("Une erreur est survenu dans l'enregistrement du prix");
+      });
+  } else {
+    Price()
+      .update(
+        {
           name: req.body.name,
           amount: req.body.amount,
           usualname: req.body.usualname,
-          type: req.body.type,
           category: req.body.category,
-        })
-        .then(() => {
-          res.status(200).send('ok');
-        });
-    }
+        },
+        { where: { id: req.body.id } }
+      )
+      .then(() => {
+        res.status(200).send('ok');
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json("Une erreur est survenu dans l'enregistrement du prix");
+      });
   }
 };
 
+const addBPToCategory = (req, res) => {
+  console.log(req.body);
+  console.log(req.params.category);
+  Price()
+    .create({
+      name: req.body.name,
+      amount: req.body.amount,
+      usualname: req.body.usualname,
+      type: 'BP',
+      category: req.params.category,
+    })
+    .then(() => {
+      res.status(200).send('ok');
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json('Une erreur est survenu lors de la création du prix');
+    });
+};
+
+const addNewPriceToNewCat = (req, res) => {
+  Price()
+    .create({
+      name: req.body.name,
+      amount: req.body.amount,
+      usualname: req.body.usualname,
+      type: 'BP',
+      category: req.body.category,
+    })
+    .then(() => {
+      res.status(200).json('ok');
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json('Une erreur est survenu lors de la création du prix');
+    });
+};
 //* REQUETE GESTION DE PRIX SPECIFIQUE
 
 const getAllPriceForSpe = (req, res) => {
   Plante()
     .findAll({
-      attributes: ["nom", "type", "id"],
+      attributes: ['nom', 'type', 'id'],
       include: [
         {
           model: Price(),
@@ -189,8 +227,11 @@ module.exports = {
   getAllCategory,
   getAllPriceOfCategory,
   getAllPrice,
-  createNewPrice,
   getAllCategoryForBP,
   getAllPriceForBP,
   getAllPriceForSpe,
+  modifBasicPrice,
+  addBPToCategory,
+  addNewPriceToNewCat,
+  deleteOnePrice,
 };
