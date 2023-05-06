@@ -3,7 +3,7 @@
 ## DEVELOPPEMENT EN COURS
 
 - [ ] Nouvelle gestion des prix
-    - [ ] création d'une clé étrangère pour gérer les prix
+    - [x] création d'une clé étrangère pour gérer les prix
     - [ ] possibilité de créer des prix en bulk et de les modifier facilement
     - [ ] import export sous forme d'excel des prix généraux
     - [ ] gestion des cas spécifique 

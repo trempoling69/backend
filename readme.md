@@ -50,3 +50,9 @@ dev en Node.js avec une bdd en MySQL
 - Définition de nouveaux models
 - Mise en place des clés étrangères 
 - Définition des bases de données pour les différent environnement DEV / TEST / PROD
+
+### update 06/05
+
+- Premières routes pour la gestion des prix
+- Model pour la table price
+- Définition de la clé étrangère prix pour chaque plante

@@ -8,8 +8,14 @@ const {
   getAllPriceOfCategory,
   getAllPrice,
   createNewPrice,
+  getAllCategoryForBP,
+  getAllPriceForBP,
+  getAllPriceForSpe,
 } = require('../controllers/controllerGestionPrix');
 
+router.get('/BP/getAllCategory', getAllCategoryForBP);
+router.get('/BP/getAllPrice', getAllPriceForBP);
+router.get('/other/getAllPrice', getAllPriceForSpe);
 router.get('/getAllCategory', getAllCategory);
 router.get('/getAllPrice', getAllPrice);
 router.get('/getprice/:category', getAllPriceOfCategory);
