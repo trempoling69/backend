@@ -57,3 +57,9 @@ dev en Node.js avec une bdd en MySQL
 - Première routes pour les prix spécifique
 - Model pour la table price
 - Définition de la clé étrangère prix pour chaque plante
+
+### update 11/05
+
+- gestion des prix spécifique
+- création des prix spécifique à la création d'une plante
+- filtre sur les input des utilisateurs dans la gestion des prix (type et caractère HTML)
