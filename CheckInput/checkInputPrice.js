@@ -23,8 +23,8 @@ const checkInputPrice = (valueToCheck, res, callback) => {
       errorMessage = `Le nouveau prix entrée doit être de type FLOAT valeur reçu ${cleanedValue(
         valueToCheck['amount']
       )}`;
-      res.write(errorMessage);
-      return true;
+      res.status(500).send(errorMessage);
+      return;
     } else {
       checkValue.set('amount', parseFloat(valueToCheck['amount']));
     }
@@ -32,8 +32,8 @@ const checkInputPrice = (valueToCheck, res, callback) => {
   if (valueToCheck['id']) {
     if (isNaN(parseInt(valueToCheck['id']))) {
       errorMessage = "Une erreur est survenue avec l'id";
-      res.write(errorMessage);
-      return true;
+      res.status(500).send(errorMessage);
+      return;
     } else {
       checkValue.set('id', parseInt(valueToCheck['id']));
     }

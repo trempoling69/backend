@@ -123,104 +123,86 @@ const getAllPriceForBP = (req, res) => {
 
 const modifBasicPrice = (req, res) => {
   if (req.body.category === 'new') {
-    if (
-      checkInputPrice(req.body, res, (data) => {
-        Price()
-          .update(
-            {
-              name: data.get('name'),
-              amount: data.get('amount'),
-              usualname: data.get('usualname'),
-              category: data.get('newCategory'),
-            },
-            { where: { id: data.get('id') } }
-          )
-          .then(() => {
-            res.status(200).send('ok');
-          })
-          .catch((err) => {
-            console.log(err);
-            res.status(500).json("Une erreur est survenu dans l'enregistrement du prix");
-          });
-      })
-    ) {
-      res.status(500).end();
-    }
-  } else {
-    if (
-      checkInputPrice(req.body, res, (data) => {
-        Price()
-          .update(
-            {
-              name: data.get('name'),
-              amount: data.get('amount'),
-              usualname: data.get('usualname'),
-              category: data.get('category'),
-            },
-            { where: { id: data.get('id') } }
-          )
-          .then(() => {
-            res.status(200).send('ok');
-          })
-          .catch((err) => {
-            console.log(err);
-            res.status(500).json("Une erreur est survenu dans l'enregistrement du prix");
-          });
-      })
-    ) {
-      res.status(500).end();
-    }
-  }
-};
-
-const addBPToCategory = (req, res) => {
-  console.log(req.body);
-  console.log(req.params.category);
-  if (
     checkInputPrice(req.body, res, (data) => {
       Price()
-        .create({
-          name: data.get('name'),
-          amount: data.get('amount'),
-          usualname: data.get('usualname'),
-          type: 'BP',
-          category: req.params.category,
-        })
+        .update(
+          {
+            name: data.get('name'),
+            amount: data.get('amount'),
+            usualname: data.get('usualname'),
+            category: data.get('newCategory'),
+          },
+          { where: { id: data.get('id') } }
+        )
         .then(() => {
           res.status(200).send('ok');
         })
         .catch((err) => {
           console.log(err);
-          res.status(500).json('Une erreur est survenu lors de la création du prix');
+          res.status(500).json("Une erreur est survenu dans l'enregistrement du prix");
         });
-    })
-  ) {
-    res.status(500).end();
-  }
-};
-
-const addNewPriceToNewCat = (req, res) => {
-  if (
+    });
+  } else {
     checkInputPrice(req.body, res, (data) => {
       Price()
-        .create({
-          name: data.get('name'),
-          amount: data.get('amount'),
-          usualname: data.get('usualname'),
-          type: 'BP',
-          category: data.get('category'),
-        })
+        .update(
+          {
+            name: data.get('name'),
+            amount: data.get('amount'),
+            usualname: data.get('usualname'),
+            category: data.get('category'),
+          },
+          { where: { id: data.get('id') } }
+        )
         .then(() => {
-          res.status(200).json('ok');
+          res.status(200).send('ok');
         })
         .catch((err) => {
           console.log(err);
-          res.status(500).json('Une erreur est survenu lors de la création du prix');
+          res.status(500).json("Une erreur est survenu dans l'enregistrement du prix");
         });
-    })
-  ) {
-    res.status(500).end();
+    });
   }
+};
+
+const addBPToCategory = (req, res) => {
+  checkInputPrice(req.body, res, (data) => {
+    Price()
+      .create({
+        name: data.get('name'),
+        amount: data.get('amount'),
+        usualname: data.get('usualname'),
+        type: 'BP',
+        category: req.params.category,
+      })
+      .then(() => {
+        res.status(200).send('ok');
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json('Une erreur est survenu lors de la création du prix');
+      });
+  });
+};
+
+const addNewPriceToNewCat = (req, res) => {
+  checkInputPrice(req.body, res, (data) => {
+    Price()
+      .create({
+        name: data.get('name'),
+        amount: data.get('amount'),
+        usualname: data.get('usualname'),
+        type: 'BP',
+        category: data.get('category'),
+      })
+      .then(() => {
+        res.status(200).json('ok');
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json('Une erreur est survenu lors de la création du prix');
+      });
+  });
 };
 //* REQUETE GESTION DE PRIX SPECIFIQUE
 
@@ -248,29 +230,24 @@ const getAllPriceForSpe = (req, res) => {
 };
 
 const modifSpecificPrice = (req, res) => {
-  console.log(req.body);
-  if (
-    checkInputPrice(req.body, res, (data) => {
-      Price()
-        .update(
-          {
-            name: data.get('name'),
-            amount: data.get('amount'),
-            usualname: data.get('usualname'),
-          },
-          { where: { id: data.get('id') } }
-        )
-        .then(() => {
-          res.status(200).send('ok');
-        })
-        .catch((err) => {
-          console.log(err);
-          res.status(500).json("Une erreur est survenu dans l'enregistrement du prix");
-        });
-    })
-  ) {
-    res.status(500).end();
-  }
+  checkInputPrice(req.body, res, (data) => {
+    Price()
+      .update(
+        {
+          name: data.get('name'),
+          amount: data.get('amount'),
+          usualname: data.get('usualname'),
+        },
+        { where: { id: data.get('id') } }
+      )
+      .then(() => {
+        res.status(200).send('ok');
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json("Une erreur est survenu dans l'enregistrement du prix");
+      });
+  });
 };
 
 module.exports = {
