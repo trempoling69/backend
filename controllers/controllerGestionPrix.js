@@ -1,5 +1,6 @@
 const { Sequelize } = require('sequelize');
 const { Price, Plante } = require('../utils/importbdd');
+const checkInputPrice = require('../CheckInput/checkInputPrice');
 
 //* REQUETE GENERAL
 
@@ -35,14 +36,14 @@ const getAllPriceOfCategory = (req, res) => {
 
 const deleteOnePrice = (req, res) => {
   Price()
-    .findOne({ where: { id: req.params.id } })
+    .findOne({ where: { id: parseInt(req.params.id) } })
     .then((price) => {
       if (price === null) {
         res.status(400).json('pas de prix qui correspond à cet id');
         return;
       }
       Price()
-        .destroy({ where: { id: req.params.id } })
+        .destroy({ where: { id: parseInt(req.params.id) } })
         .then(() => {
           res.status(200).json('ok');
         })
@@ -107,7 +108,6 @@ const getAllPriceForBP = (req, res) => {
             })
           );
           let arrayPrices = [...priceWithPlante[0], ...formatedArray[0]];
-          console.log(arrayPrices);
           res.json(arrayPrices);
         })
         .catch((error) => {
@@ -122,82 +122,105 @@ const getAllPriceForBP = (req, res) => {
 };
 
 const modifBasicPrice = (req, res) => {
-  console.log(req.body);
   if (req.body.category === 'new') {
-    Price()
-      .update(
-        {
-          name: req.body.name,
-          amount: req.body.amount,
-          usualname: req.body.usualname,
-          category: req.body.newCategory,
-        },
-        { where: { id: req.body.id } }
-      )
-      .then(() => {
-        res.status(200).send('ok');
+    if (
+      checkInputPrice(req.body, res, (data) => {
+        Price()
+          .update(
+            {
+              name: data.get('name'),
+              amount: data.get('amount'),
+              usualname: data.get('usualname'),
+              category: data.get('newCategory'),
+            },
+            { where: { id: data.get('id') } }
+          )
+          .then(() => {
+            res.status(200).send('ok');
+          })
+          .catch((err) => {
+            console.log(err);
+            res.status(500).json("Une erreur est survenu dans l'enregistrement du prix");
+          });
       })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).json("Une erreur est survenu dans l'enregistrement du prix");
-      });
+    ) {
+      res.status(500).end();
+    }
   } else {
-    Price()
-      .update(
-        {
-          name: req.body.name,
-          amount: req.body.amount,
-          usualname: req.body.usualname,
-          category: req.body.category,
-        },
-        { where: { id: req.body.id } }
-      )
-      .then(() => {
-        res.status(200).send('ok');
+    if (
+      checkInputPrice(req.body, res, (data) => {
+        Price()
+          .update(
+            {
+              name: data.get('name'),
+              amount: data.get('amount'),
+              usualname: data.get('usualname'),
+              category: data.get('category'),
+            },
+            { where: { id: data.get('id') } }
+          )
+          .then(() => {
+            res.status(200).send('ok');
+          })
+          .catch((err) => {
+            console.log(err);
+            res.status(500).json("Une erreur est survenu dans l'enregistrement du prix");
+          });
       })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).json("Une erreur est survenu dans l'enregistrement du prix");
-      });
+    ) {
+      res.status(500).end();
+    }
   }
 };
 
 const addBPToCategory = (req, res) => {
   console.log(req.body);
   console.log(req.params.category);
-  Price()
-    .create({
-      name: req.body.name,
-      amount: req.body.amount,
-      usualname: req.body.usualname,
-      type: 'BP',
-      category: req.params.category,
+  if (
+    checkInputPrice(req.body, res, (data) => {
+      Price()
+        .create({
+          name: data.get('name'),
+          amount: data.get('amount'),
+          usualname: data.get('usualname'),
+          type: 'BP',
+          category: req.params.category,
+        })
+        .then(() => {
+          res.status(200).send('ok');
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(500).json('Une erreur est survenu lors de la création du prix');
+        });
     })
-    .then(() => {
-      res.status(200).send('ok');
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json('Une erreur est survenu lors de la création du prix');
-    });
+  ) {
+    res.status(500).end();
+  }
 };
 
 const addNewPriceToNewCat = (req, res) => {
-  Price()
-    .create({
-      name: req.body.name,
-      amount: req.body.amount,
-      usualname: req.body.usualname,
-      type: 'BP',
-      category: req.body.category,
+  if (
+    checkInputPrice(req.body, res, (data) => {
+      Price()
+        .create({
+          name: data.get('name'),
+          amount: data.get('amount'),
+          usualname: data.get('usualname'),
+          type: 'BP',
+          category: data.get('category'),
+        })
+        .then(() => {
+          res.status(200).json('ok');
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(500).json('Une erreur est survenu lors de la création du prix');
+        });
     })
-    .then(() => {
-      res.status(200).json('ok');
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json('Une erreur est survenu lors de la création du prix');
-    });
+  ) {
+    res.status(500).end();
+  }
 };
 //* REQUETE GESTION DE PRIX SPECIFIQUE
 
@@ -223,6 +246,33 @@ const getAllPriceForSpe = (req, res) => {
       res.status(500).json({ error: 'Une erreur est survenue lors de la récupération des prix.' });
     });
 };
+
+const modifSpecificPrice = (req, res) => {
+  console.log(req.body);
+  if (
+    checkInputPrice(req.body, res, (data) => {
+      Price()
+        .update(
+          {
+            name: data.get('name'),
+            amount: data.get('amount'),
+            usualname: data.get('usualname'),
+          },
+          { where: { id: data.get('id') } }
+        )
+        .then(() => {
+          res.status(200).send('ok');
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(500).json("Une erreur est survenu dans l'enregistrement du prix");
+        });
+    })
+  ) {
+    res.status(500).end();
+  }
+};
+
 module.exports = {
   getAllCategory,
   getAllPriceOfCategory,
@@ -234,4 +284,5 @@ module.exports = {
   addBPToCategory,
   addNewPriceToNewCat,
   deleteOnePrice,
+  modifSpecificPrice,
 };

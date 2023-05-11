@@ -6,6 +6,7 @@ const { checkParamsId } = require('../CheckInput/checkParamsId');
 const upload = require('../middleware/multer');
 const fs = require('fs');
 const { createHashPlante } = require('../utils/hashimportbdd');
+const checkInputPriceForPlante = require('../CheckInput/checkInputPriceForPlante');
 
 const allPlantes = (req, res) => {
   Plante()
@@ -25,7 +26,7 @@ const planteById = (req, res) => {
         id: id,
       },
       include: [{ model: Price(), as: 'fk_price' }],
-      attributes: {exclude: ['prix']}
+      attributes: { exclude: ['prix'] },
     })
     .then((plantes) => {
       if (plantes === null) {
@@ -45,49 +46,26 @@ const insertPlante = (req, res) => {
       console.log(err.message);
       res.status(400).send(err.message);
     } else {
-      if (
-        checkuserInputAdd(req.body, req.file, configBdd(), res, (data) => {
-          createHashPlante(data, (hashPlante) => {
-            Plante()
+      if (req.body.prix === 'new') {
+        if (
+          checkInputPriceForPlante(req.body, res, (checkedValue) => {
+            Price()
               .create({
-                nom: data.get('nom'),
-                description: data.get('description'),
-                couleur_dispo: data.get('couleur_dispo'),
-                type: data.get('type'),
-                feuillage: data.get('feuillage'),
-                collection: data.get('collection'),
-                exposition: data.get('exposition'),
-                hauteur: data.get('hauteur'),
-                mois_floraison: data.get('mois_floraison'),
-                periode_floraison: data.get('periode_floraison'),
-                besoin_eau: data.get('besoin_eau'),
-                photo: data.get('photo'),
-                dispo: data.get('dispo'),
-                prix: data.get('prix'),
-                emplacement: data.get('emplacement'),
-                quantiteProd: data.get('quantiteProd'),
-                catchPhrase: data.get('catchPhrase'),
-                hashPlante: hashPlante,
+                name: `Prix_${checkedValue.get('nom')}`,
+                usualname: `Prix pour ${checkedValue.get('nom')}`,
+                amount: checkedValue.get('newPrice'),
+                type: 'OTHER',
               })
-              .then((result) => {
-                res.status(200).send('plante ajouté');
-              })
-              .catch((err) => {
-                res.status(400).send(err.message);
+              .then((prix) => {
+                req.body.prix = prix.id;
+                insertOnePlante(req, res);
               });
-          });
-        })
-      ) {
-        fs.unlink(`images/${req.file.filename}`, (err) => {
-          if (err) {
-            console.log(err);
-            res.write('une erreur est survenu');
-            res.end();
-            return;
-          }
-          res.write(" . L'image n'a pas été enregistrée.");
+          })
+        ) {
           res.end();
-        });
+        }
+      } else {
+        insertOnePlante(req, res);
       }
     }
   });
@@ -202,6 +180,56 @@ const suppPlante = (req, res) => {
       })
       .catch((err) => res.status(400).send(err));
   });
+};
+
+const insertOnePlante = (req, res) => {
+  if (
+    checkuserInputAdd(req.body, req.file, configBdd(), res, (data) => {
+      createHashPlante(data, (hashPlante) => {
+        Plante()
+          .create({
+            nom: data.get('nom'),
+            description: data.get('description'),
+            couleur_dispo: data.get('couleur_dispo'),
+            type: data.get('type'),
+            feuillage: data.get('feuillage'),
+            collection: data.get('collection'),
+            exposition: data.get('exposition'),
+            hauteur: data.get('hauteur'),
+            mois_floraison: data.get('mois_floraison'),
+            periode_floraison: data.get('periode_floraison'),
+            besoin_eau: data.get('besoin_eau'),
+            photo: data.get('photo'),
+            dispo: data.get('dispo'),
+            prix: data.get('prix'),
+            emplacement: data.get('emplacement'),
+            quantiteProd: data.get('quantiteProd'),
+            catchPhrase: data.get('catchPhrase'),
+            hashPlante: hashPlante,
+          })
+          .then((result) => {
+            res.status(200).send('plante ajouté');
+          })
+          .catch((err) => {
+            res.status(400).send(err.message);
+          });
+      });
+    })
+  ) {
+    if (req.file !== undefined) {
+      fs.unlink(`images/${req.file.filename}`, (err) => {
+        if (err) {
+          console.log(err);
+          res.write('une erreur est survenu');
+          res.end();
+          return;
+        }
+        res.write(" . L'image n'a pas été enregistrée.");
+        res.end();
+      });
+    }
+    res.end();
+  }
 };
 
 module.exports = {

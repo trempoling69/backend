@@ -14,6 +14,7 @@ const {
   addBPToCategory,
   addNewPriceToNewCat,
   deleteOnePrice,
+  modifSpecificPrice,
 } = require('../controllers/controllerGestionPrix');
 
 //* BASIC PRICE
@@ -25,11 +26,12 @@ router.post('/BP/createpandcat', upload.none(), addNewPriceToNewCat); //!
 
 //* SPECIFIC PRICE
 router.get('/other/getAllPrice', getAllPriceForSpe); //!
+router.post('/other/modifprice', upload.none(), modifSpecificPrice); //!
 
 //* GENERAL REQUEST
 router.get('/getAllCategory', getAllCategory);
 router.get('/getAllPrice', getAllPrice);
 router.get('/getprice/:category', getAllPriceOfCategory);
-router.delete('/deleteoneprice/:id', deleteOnePrice);
+router.delete('/deleteoneprice/:id', deleteOnePrice); //!
 
 module.exports = router;
