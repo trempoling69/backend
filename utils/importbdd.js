@@ -81,9 +81,7 @@ exports.configBdd = () => {
       valeurs: ['InStock', 'OutStock', 'null'],
     },
     prix: {
-      type: 'int',
-      length: '11',
-      notNull: true,
+      type: 'prix',
     },
     emplacement: {
       type: 'string',

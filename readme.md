@@ -63,3 +63,12 @@ dev en Node.js avec une bdd en MySQL
 - gestion des prix spécifique
 - création des prix spécifique à la création d'une plante
 - filtre sur les input des utilisateurs dans la gestion des prix (type et caractère HTML)
+
+### update 18/05
+
+- import export des prix 
+- check des valeurs entrée dans le excel
+- gestion de l'erreur de clé étrangère du prix qui n'existe pas dans plante lors de l'importation excel
+- Ajout d'un hash au prix pour gérer les ajouts / doublons / modification via excel
+- Modification d'une plante mis a jour pour les clé étrangère de prix
+- Export excel, sheet prix ajouté

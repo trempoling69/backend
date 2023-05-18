@@ -207,13 +207,22 @@ const addNewPriceToNewCat = (req, res) => {
 //* REQUETE GESTION DE PRIX SPECIFIQUE
 
 const getAllPriceForSpe = (req, res) => {
+  let priceWithPlante = [];
+  let priceWithoutPlante = [];
   Plante()
     .findAll({
       attributes: ['nom', 'type', 'id'],
       include: [
         {
           model: Price(),
-          attributes: ['amount', 'usualname', 'name', 'category', 'id'],
+          attributes: [
+            'amount',
+            'usualname',
+            'name',
+            'category',
+            'id',
+            [Sequelize.fn('COUNT', Sequelize.col('description')), 'nombre_de_plantes'],
+          ],
           where: { type: 'OTHER' },
           as: 'fk_price',
         },
@@ -221,7 +230,32 @@ const getAllPriceForSpe = (req, res) => {
       group: ['prix'],
     })
     .then((prices) => {
-      res.json(prices);
+      // res.json(prices);
+      priceWithPlante.push(prices);
+      Price()
+        .findAll({
+          where: {
+            type: 'OTHER',
+            id: {
+              [Sequelize.Op.notIn]: Sequelize.literal(`(SELECT DISTINCT prix FROM Plantes WHERE prix IS NOT NULL)`),
+            },
+          },
+        })
+        .then((prices) => {
+          priceWithoutPlante.push(prices);
+          let formatedArray = [];
+          formatedArray.push(
+            priceWithoutPlante[0].map((price) => {
+              return { nombre_de_plantes: 0,nom: 'aucune plante', type:'aucun', fk_price: price };
+            })
+          );
+          let arrayPrices = [...priceWithPlante[0], ...formatedArray[0]];
+          res.json(arrayPrices);
+        })
+        .catch((error) => {
+          console.log(error);
+          res.status(500).json({ error: 'Une erreur est survenue lors de la récupération des prix.' });
+        });
     })
     .catch((error) => {
       console.log(error);

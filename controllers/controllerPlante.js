@@ -96,40 +96,26 @@ const modifPlante = (req, res, next) => {
         }
         photo = req.file.filename;
       }
-      if (
-        checkuserInputAdd(req.body, null, configBdd(), res, (data) => {
-          Plante()
-            .update(
-              {
-                nom: data.get('nom'),
-                description: data.get('description'),
-                couleur_dispo: data.get('couleur_dispo'),
-                type: data.get('type'),
-                feuillage: data.get('feuillage'),
-                collection: data.get('collection'),
-                exposition: data.get('exposition'),
-                hauteur: data.get('hauteur'),
-                mois_floraison: data.get('mois_floraison'),
-                periode_floraison: data.get('periode_floraison'),
-                besoin_eau: data.get('besoin_eau'),
-                photo: photo,
-                dispo: data.get('dispo'),
-                prix: data.get('prix'),
-                emplacement: data.get('emplacement'),
-                quantiteProd: data.get('quantiteProd'),
-                catchPhrase: data.get('catchPhrase'),
-              },
-              {
-                where: { id: req.body.id },
-              }
-            )
-            .then((result) => {
-              res.status(200).send('Plante modifié');
-            });
-        })
-      ) {
-        console.log('ici');
-        res.end();
+      if (req.body.prix === 'new') {
+        if (
+          checkInputPriceForPlante(req.body, res, (checkedValue) => {
+            Price()
+              .create({
+                name: `Prix_${checkedValue.get('nom')}`,
+                usualname: `Prix pour ${checkedValue.get('nom')}`,
+                amount: checkedValue.get('newPrice'),
+                type: 'OTHER',
+              })
+              .then((prix) => {
+                req.body.prix = prix.id;
+                modificationPlante(req, res, photo);
+              });
+          })
+        ) {
+          res.end();
+        }
+      } else {
+        modificationPlante(req, res, photo);
       }
     }
   });
@@ -228,6 +214,44 @@ const insertOnePlante = (req, res) => {
         res.end();
       });
     }
+    res.end();
+  }
+};
+
+const modificationPlante = (req, res, photo) => {
+  if (
+    checkuserInputAdd(req.body, null, configBdd(), res, (data) => {
+      Plante()
+        .update(
+          {
+            nom: data.get('nom'),
+            description: data.get('description'),
+            couleur_dispo: data.get('couleur_dispo'),
+            type: data.get('type'),
+            feuillage: data.get('feuillage'),
+            collection: data.get('collection'),
+            exposition: data.get('exposition'),
+            hauteur: data.get('hauteur'),
+            mois_floraison: data.get('mois_floraison'),
+            periode_floraison: data.get('periode_floraison'),
+            besoin_eau: data.get('besoin_eau'),
+            photo: photo,
+            dispo: data.get('dispo'),
+            prix: data.get('prix'),
+            emplacement: data.get('emplacement'),
+            quantiteProd: data.get('quantiteProd'),
+            catchPhrase: data.get('catchPhrase'),
+          },
+          {
+            where: { id: req.body.id },
+          }
+        )
+        .then((result) => {
+          res.status(200).send('Plante modifié');
+        });
+    })
+  ) {
+    console.log('ici');
     res.end();
   }
 };
