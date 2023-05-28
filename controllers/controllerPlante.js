@@ -5,7 +5,7 @@ const { checkInputToggleDispo } = require('../CheckInput/checkInputToggleDispo')
 const { checkParamsId } = require('../CheckInput/checkParamsId');
 const upload = require('../middleware/multer');
 const fs = require('fs');
-const { createHashPlante } = require('../utils/hashimportbdd');
+const { createHashPlante, createHashPrice } = require('../utils/hashimportbdd');
 const checkInputPriceForPlante = require('../CheckInput/checkInputPriceForPlante');
 
 const allPlantes = (req, res) => {
@@ -49,17 +49,20 @@ const insertPlante = (req, res) => {
       if (req.body.prix === 'new') {
         if (
           checkInputPriceForPlante(req.body, res, (checkedValue) => {
-            Price()
-              .create({
-                name: `Prix_${checkedValue.get('nom')}`,
-                usualname: `Prix pour ${checkedValue.get('nom')}`,
-                amount: checkedValue.get('newPrice'),
-                type: 'OTHER',
-              })
-              .then((prix) => {
-                req.body.prix = prix.id;
-                insertOnePlante(req, res);
-              });
+            createHashPrice(checkedValue, (hashPrice) => {
+              Price()
+                .create({
+                  name: `Prix_${checkedValue.get('nom')}`,
+                  usualname: `Prix pour ${checkedValue.get('nom')}`,
+                  amount: checkedValue.get('newPrice'),
+                  type: 'OTHER',
+                  hashPrice: hashPrice,
+                })
+                .then((prix) => {
+                  req.body.prix = prix.id;
+                  insertOnePlante(req, res);
+                });
+            });
           })
         ) {
           res.end();
@@ -81,10 +84,12 @@ const modifPlante = (req, res, next) => {
       res.status(400).send(err.message);
     } else {
       let photo = '';
+      let modifyPhoto = false;
       if (req.file === undefined) {
         photo = req.body.photo.replace(/[<>]/g, '');
       } else if (req.body.photo === 'null') {
         photo = req.file.filename;
+        modifyPhoto = true;
       } else {
         const path = `./images/${req.body.photo.replace(/[<>]/g, '')}`;
         if (fs.existsSync(path)) {
@@ -95,23 +100,37 @@ const modifPlante = (req, res, next) => {
           }
         }
         photo = req.file.filename;
+        modifyPhoto = true;
       }
       if (req.body.prix === 'new') {
         if (
           checkInputPriceForPlante(req.body, res, (checkedValue) => {
-            Price()
-              .create({
-                name: `Prix_${checkedValue.get('nom')}`,
-                usualname: `Prix pour ${checkedValue.get('nom')}`,
-                amount: checkedValue.get('newPrice'),
-                type: 'OTHER',
-              })
-              .then((prix) => {
-                req.body.prix = prix.id;
-                modificationPlante(req, res, photo);
-              });
+            createHashPrice(checkedValue, (hashPrice) => {
+              Price()
+                .create({
+                  name: `Prix_${checkedValue.get('nom')}`,
+                  usualname: `Prix pour ${checkedValue.get('nom')}`,
+                  amount: checkedValue.get('newPrice'),
+                  type: 'OTHER',
+                  hashPrice: hashPrice,
+                })
+                .then((prix) => {
+                  req.body.prix = prix.id;
+                  modificationPlante(req, res, photo);
+                });
+            });
           })
         ) {
+          if (modifyPhoto) {
+            const path = `./images/${req.file.filename}`;
+            if (fs.existsSync(path)) {
+              try {
+                fs.unlinkSync(path);
+              } catch (err) {
+                res.status(400).send(err);
+              }
+            }
+          }
           res.end();
         }
       } else {
