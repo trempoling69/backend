@@ -1,33 +1,33 @@
-const { Question, Reponse, Plante } = require("../utils/importbdd");
+const { Question, Reponse, Plante } = require('../utils/importbdd');
 
 const getQR = (req, res) => {
   Question()
     .findAll({
-      attributes: ["id", "texte_question", "start"],
+      attributes: ['id', 'texte_question', 'start'],
       include: [
         {
           model: Reponse(),
-          as: "Reponse1",
+          as: 'Reponse1',
         },
         {
           model: Reponse(),
-          as: "Reponse2",
+          as: 'Reponse2',
         },
         {
           model: Reponse(),
-          as: "Reponse3",
+          as: 'Reponse3',
         },
         {
           model: Reponse(),
-          as: "Reponse4",
+          as: 'Reponse4',
         },
         {
           model: Reponse(),
-          as: "Reponse5",
+          as: 'Reponse5',
         },
         {
           model: Reponse(),
-          as: "Reponse6",
+          as: 'Reponse6',
         },
       ],
     })
@@ -39,7 +39,7 @@ const getQR = (req, res) => {
 const getPlante = (req, res) => {
   Plante()
     .findAll({
-      attributes: { exclude: ["id_plantes", "quantiteProd", "hashPlante"] },
+      attributes: { exclude: ['id_plantes', 'quantiteProd', 'hashPlante'] },
     })
     .then((plantes) => {
       res.json(plantes);

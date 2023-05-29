@@ -19,8 +19,9 @@ const user_routes = require('./routes/user');
 const quiz_routes = require('./routes/quiz');
 const gestionquiz_routes = require('./routes/modifQuiz');
 const price_routes = require('./routes/price');
-const order_routes = require('./routes/order');
+const cart_routes = require('./routes/cart');
 const gestionprix_routes = require('./routes/gestionPrix');
+const order_routes = require('./routes/order');
 //-----------------------------------------------HEBERGEMENT-----------------------------------------------------------------------------
 // if (typeof PhusionPassenger !== "undefined") {
 //   PhusionPassenger.configure({ autoInstall: false });
@@ -39,7 +40,7 @@ models.Plante.sync();
 models.User.sync();
 models.Reponse.sync();
 models.Question.sync();
-models.Order.sync();
+models.Cart.sync();
 // models.sequelize.sync().then(()=>{
 //   console.log('bdd synchorinise');
 // })
@@ -87,13 +88,15 @@ app.use('/api/plante', plante_routes);
 app.use('/api/excel', excel_routes);
 app.use('/api/Gestionquiz', gestionquiz_routes);
 app.use('/api/gestionprix', gestionprix_routes);
+app.use('/api/order', order_routes);
 
 //*ROUTE POUR LE QUIZ
 app.use('/quiz', quiz_routes);
 
 //*ROUTE POUR L'APP
 app.use('/price', price_routes);
-app.use('/order', order_routes);
+app.use('/cart', cart_routes);
+
 //*ROUTE BASIQUE
 app.get('/', (req, res) => {
   res.send("Bienvenue sur l'api privé de RougyHorticulure");

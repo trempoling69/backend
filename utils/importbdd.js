@@ -103,6 +103,6 @@ exports.Price = () => {
   return models.Price;
 };
 
-exports.Order = () => {
-  return models.Order;
+exports.Cart = () => {
+  return models.Cart;
 };

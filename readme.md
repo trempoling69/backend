@@ -72,3 +72,7 @@ dev en Node.js avec une bdd en MySQL
 - Ajout d'un hash au prix pour gérer les ajouts / doublons / modification via excel
 - Modification d'une plante mis a jour pour les clé étrangère de prix
 - Export excel, sheet prix ajouté
+
+### update 29/05 
+
+- préparation pour l'implémentation des commandes
