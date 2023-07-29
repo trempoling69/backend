@@ -42,7 +42,7 @@ exports.configBdd = () => {
     feuillage: {
       type: 'string',
       length: '40',
-      valeurs: ['caduque', 'persistant', 'null'],
+      valeurs: ['caduque', 'persistant', null],
     },
     collection: {
       type: 'string',
@@ -51,7 +51,7 @@ exports.configBdd = () => {
     exposition: {
       type: 'string',
       length: '50',
-      valeurs: ['Mi-Ombre', 'Ombre', 'Soleil', 'Polyvalente', 'null'],
+      valeurs: ['Mi-Ombre', 'Ombre', 'Soleil', 'Polyvalente', null],
     },
     hauteur: {
       type: 'string',
@@ -64,12 +64,12 @@ exports.configBdd = () => {
     periode_floraison: {
       type: 'string',
       length: '20',
-      valeurs: ['été', 'printemps', 'automne', 'hiver', 'null'],
+      valeurs: ['été', 'printemps', 'automne', 'hiver', null],
     },
     besoin_eau: {
       type: 'string',
       length: '50',
-      valeurs: ['un_peu', 'beaucoup', 'moyen', 'null'],
+      valeurs: ['un_peu', 'beaucoup', 'moyen', null],
     },
     photo: {
       type: 'photo',
@@ -78,7 +78,7 @@ exports.configBdd = () => {
     dispo: {
       type: 'string',
       length: '20',
-      valeurs: ['InStock', 'OutStock', 'null'],
+      valeurs: ['InStock', 'OutStock', null],
     },
     prix: {
       type: 'prix',

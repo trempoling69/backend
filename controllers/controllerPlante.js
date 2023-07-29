@@ -86,8 +86,12 @@ const modifPlante = (req, res, next) => {
       let photo = '';
       let modifyPhoto = false;
       if (req.file === undefined) {
-        photo = req.body.photo.replace(/[<>]/g, '');
-      } else if (req.body.photo === 'null') {
+        if (req.body.photo === '') {
+          photo = null;
+        } else {
+          photo = req.body.photo.replace(/[<>]/g, '');
+        }
+      } else if (req.body.photo === '') {
         photo = req.file.filename;
         modifyPhoto = true;
       } else {
@@ -166,7 +170,7 @@ const suppPlante = (req, res) => {
       .findOne({ where: { id: data.get('id') } })
       .then((plante) => {
         if (plante == null) {
-          res.status(400).send('Aucune plante correspond à celle que vous suppirmez');
+          res.status(400).send('Aucune plante correspond à celle que vous supprimez');
         } else {
           Plante()
             .destroy({ where: { id: plante.id } })
@@ -216,6 +220,7 @@ const insertOnePlante = (req, res) => {
             res.status(200).send('plante ajouté');
           })
           .catch((err) => {
+            console.log(err);
             res.status(400).send(err.message);
           });
       });

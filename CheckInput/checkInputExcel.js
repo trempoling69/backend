@@ -7,6 +7,9 @@
  **un object Map à une callback
  **/
 const cleanedValue = (value) => {
+  if (value === null) {
+    return value;
+  }
   const cleanedValue = value.replace(/[<>]/g, '').trim();
   return cleanedValue;
 };
@@ -24,14 +27,18 @@ exports.checkInputExcel = (plante, bddplante, index, actualSheet, filereport, re
         // resolve();
         // return;
       } else {
-        checkValue.set(nomcolonne, 'null');
+        checkValue.set(nomcolonne, null);
       }
     } else {
       checkValue.set(nomcolonne, plante[nomcolonne]);
     }
     for (params in bddplante[nomcolonne]) {
       parametre = bddplante[nomcolonne][params];
-      if (params === 'length' && checkValue.get(nomcolonne).length > parseInt(parametre)) {
+      if (
+        params === 'length' &&
+        checkValue.get(nomcolonne) != null &&
+        checkValue.get(nomcolonne).length > parseInt(parametre)
+      ) {
         filereport(
           './logs/logs.txt',
           `${nomcolonne} valeur trop grande pour la ligne ${index} dans la sheet ${actualSheet}`
@@ -51,10 +58,10 @@ exports.checkInputExcel = (plante, bddplante, index, actualSheet, filereport, re
         // resolve();
         // return;
       }
-      if (params === 'type' && parametre === 'string' && checkValue.get(nomcolonne) != 'null') {
+      if (params === 'type' && parametre === 'string' && checkValue.get(nomcolonne) != null) {
         checkValue.set(nomcolonne, cleanedValue(checkValue.get(nomcolonne)));
       }
-      if (params === 'type' && parametre === 'float' && checkValue.get(nomcolonne) != 'null') {
+      if (params === 'type' && parametre === 'float' && checkValue.get(nomcolonne) != null) {
         if (isNaN(parseFloat(checkValue.get(nomcolonne)))) {
           filereport(
             './logs/logs.txt',
@@ -69,7 +76,7 @@ exports.checkInputExcel = (plante, bddplante, index, actualSheet, filereport, re
           checkValue.set(nomcolonne, parseFloat(checkValue.get(nomcolonne)));
         }
       }
-      if (params === 'type' && parametre === 'int' && checkValue.get(nomcolonne) != 'null') {
+      if (params === 'type' && parametre === 'int' && checkValue.get(nomcolonne) != null) {
         if (isNaN(parseInt(checkValue.get(nomcolonne)))) {
           filereport(
             './logs/logs.txt',
@@ -88,7 +95,7 @@ exports.checkInputExcel = (plante, bddplante, index, actualSheet, filereport, re
         checkValue.set(nomcolonne, cleanedValue(checkValue.get(nomcolonne)));
       }
       if (params === 'type' && parametre === 'prix') {
-        if (checkValue.get(nomcolonne) === 'null') {
+        if (checkValue.get(nomcolonne) === null) {
           checkValue.set(nomcolonne, null);
         } else {
           if (isNaN(parseInt(checkValue.get(nomcolonne)))) {

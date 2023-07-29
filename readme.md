@@ -76,3 +76,7 @@ dev en Node.js avec une bdd en MySQL
 ### update 29/05 
 
 - préparation pour l'implémentation des commandes
+
+### update 29/07
+
+- changement dans l'import pour que les champs vide soit null et non plus le string 'null'
