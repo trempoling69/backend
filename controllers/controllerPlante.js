@@ -7,15 +7,20 @@ const upload = require('../middleware/multer');
 const fs = require('fs');
 const { createHashPlante, createHashPrice } = require('../utils/hashimportbdd');
 const checkInputPriceForPlante = require('../CheckInput/checkInputPriceForPlante');
+const { sendSuccessResponse, sendErrorResponse } = require('../middleware/responseTemplate');
 
-const allPlantes = (req, res) => {
-  Plante()
-    .findAll({
-      include: [{ model: Price(), as: 'fk_price' }],
-    })
-    .then((plantes) => {
-      res.json(plantes);
-    });
+const allPlantes = (req, res, next) => {
+  try {
+    Plante()
+      .findAll({
+        include: [{ model: Price(), as: 'fk_price' }],
+      })
+      .then((plantes) => {
+        sendSuccessResponse(plantes, res, 200);
+      });
+  } catch (err) {
+    next(err);
+  }
 };
 
 const planteById = (req, res) => {
@@ -144,24 +149,28 @@ const modifPlante = (req, res, next) => {
   });
 };
 
-const toggleDispo = (req, res) => {
-  checkInputToggleDispo(req, res, (data) => {
-    Plante()
-      .update(
-        {
-          dispo: data.get('dispo'),
-        },
-        {
-          where: { id: data.get('id') },
-        }
-      )
-      .then((result) => {
-        res.status(200).send(result);
-      })
-      .catch((err) => {
-        res.status(400).send(err.message);
-      });
-  });
+const toggleDispo = (req, res, next) => {
+  try {
+    checkInputToggleDispo(req, res, (data) => {
+      Plante()
+        .update(
+          {
+            dispo: data.get('dispo'),
+          },
+          {
+            where: { id: data.get('id') },
+          }
+        )
+        .then(() => {
+          sendSuccessResponse('La disponibilité à été changé avec succès', res, 200);
+        })
+        .catch((err) => {
+          sendErrorResponse(err.message, res, 500);
+        });
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
 const suppPlante = (req, res) => {

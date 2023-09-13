@@ -1,61 +1,73 @@
-const { Op } = require("sequelize");
-const { Plante, User } = require("../utils/importbdd");
+const { Op } = require('sequelize');
+const { Plante, User } = require('../utils/importbdd');
 
 const counteverything = async () => {
-  var countAll = new Map([]);
+  var countAll = {};
   await Plante()
     .count({
       where: {
         type: {
-          [Op.like]: "Vivaces",
+          [Op.like]: 'Vivace',
         },
       },
     })
     .then((count) => {
-      countAll.set("vivaces", count);
+      countAll['Vivaces'] = count;
     });
-  await Plante().count({
-    where: {
-      type: {
-        [Op.like]: "annuelle",
+  await Plante()
+    .count({
+      where: {
+        type: {
+          [Op.like]: 'Annuelle',
+        },
       },
-    },
-  }).then((count) => {
-    countAll.set("Annuelles", count);
-  });
-  await Plante().count({
-    where: {
-      type: {
-        [Op.like]: "Arbustes",
+    })
+    .then((count) => {
+      countAll['Annuelles'] = count;
+    });
+  await Plante()
+    .count({
+      where: {
+        type: {
+          [Op.like]: 'Arbuste',
+        },
       },
-    },
-  }).then((count) => {
-    countAll.set("Arbustes", count);
-  });
-  await Plante().count({}).then((count) => {
-    countAll.set("Plantes", count);
-  });
-  await Plante().count({
-    where: {
-      dispo: {
-        [Op.like]: "InStock",
+    })
+    .then((count) => {
+      countAll['Arbustes'] = count;
+    });
+  await Plante()
+    .count({})
+    .then((count) => {
+      countAll['Plantes'] = count;
+    });
+  await Plante()
+    .count({
+      where: {
+        dispo: {
+          [Op.like]: true,
+        },
       },
-    },
-  }).then((count) => {
-    countAll.set("InStock", count);
-  });
-  await Plante().count({
-    where: {
-      dispo: {
-        [Op.like]: "OutStock",
+    })
+    .then((count) => {
+      countAll['InStock'] = count;
+    });
+  await Plante()
+    .count({
+      where: {
+        dispo: {
+          [Op.like]: false,
+        },
       },
-    },
-  }).then((count) => {
-    countAll.set("OutStock", count);
-  });
-  await User().count({}).then((count) => {
-    countAll.set("user", count);
-  });
+    })
+    .then((count) => {
+      countAll['OutStock'] = count;
+    });
+  await User()
+    .count({})
+    .then((count) => {
+      countAll['user'] = count;
+    });
 
   return countAll;
 };

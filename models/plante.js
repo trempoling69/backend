@@ -14,6 +14,12 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       });
+      Plante.belongsTo(models.Pot, {
+        foreignKey: 'potId',
+        as: 'fk_pot',
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+      });
     }
   }
   Plante.init(
@@ -49,9 +55,12 @@ module.exports = (sequelize, DataTypes) => {
       besoin_eau: DataTypes.STRING,
       photo: DataTypes.STRING,
       dispo: {
-        type: DataTypes.STRING,
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
         validate: {
-          isIn: [['InStock', 'OutStock', 'null']],
+          notEmpty: true,
+          isIn: [[0, 1, true, false]],
         },
       },
       prix: {
@@ -64,6 +73,13 @@ module.exports = (sequelize, DataTypes) => {
       emplacement: DataTypes.STRING,
       quantiteProd: DataTypes.INTEGER,
       catchPhrase: DataTypes.STRING,
+      potId: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: 'Pots',
+          key: 'id',
+        },
+      },
       hashPlante: {
         type: DataTypes.STRING,
         allowNull: false,

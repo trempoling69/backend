@@ -36,7 +36,7 @@ exports.configBdd = () => {
     type: {
       type: 'string',
       length: '50',
-      valeurs: ['Vivaces', 'annuelle', 'Arbustes'],
+      valeurs: ['Vivace', 'Annuelle', 'Arbuste'],
       notNull: true,
     },
     feuillage: {
@@ -76,9 +76,10 @@ exports.configBdd = () => {
       length: '100',
     },
     dispo: {
-      type: 'string',
+      type: 'boolean',
       length: '20',
-      valeurs: ['InStock', 'OutStock', null],
+      valeurs: [false, true, 0, 1, 'VRAI', 'FAUX', 'false', 'true'],
+      notNull: true,
     },
     prix: {
       type: 'prix',
@@ -105,4 +106,8 @@ exports.Price = () => {
 
 exports.Cart = () => {
   return models.Cart;
+};
+
+exports.Pot = () => {
+  return models.Pot;
 };

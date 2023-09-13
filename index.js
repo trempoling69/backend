@@ -22,6 +22,7 @@ const price_routes = require('./routes/price');
 const cart_routes = require('./routes/cart');
 const gestionprix_routes = require('./routes/gestionPrix');
 const order_routes = require('./routes/order');
+const pot_routes = require('./routes/pot');
 //-----------------------------------------------HEBERGEMENT-----------------------------------------------------------------------------
 // if (typeof PhusionPassenger !== "undefined") {
 //   PhusionPassenger.configure({ autoInstall: false });
@@ -36,9 +37,10 @@ const order_routes = require('./routes/order');
 //------------------------------------------GESTION BASE DE DONNEE------------------------------------------------------
 var models = require('./models/index');
 models.Price.sync();
-models.Plante.sync();
+models.Pot.sync();
 models.User.sync();
 models.Reponse.sync();
+models.Plante.sync();
 models.Question.sync();
 models.Cart.sync();
 // models.sequelize.sync().then(()=>{
@@ -46,16 +48,16 @@ models.Cart.sync();
 // })
 //------------------------------------------------------FIN GESTION BASE DE DONNEE-------------------------------------------------
 //*CONFIG SERVER
-const limiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 heure
-  max: 3000, // limite à ce nombre de requêtes par heure
-  message: 'Trop de requêtes de cette adresse IP, veuillez réessayer plus tard',
-});
+// const limiter = rateLimit({
+//   windowMs: 60 * 60 * 1000, // 1 heure
+//   max: 3000, // limite à ce nombre de requêtes par heure
+//   message: 'Trop de requêtes de cette adresse IP, veuillez réessayer plus tard',
+// });
 app.use(helmet());
 app.disable('x-powered-by');
 app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 app.use(helmet.frameguard({ action: 'deny' }));
-app.use(limiter);
+// app.use(limiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/images', express.static('images'));
@@ -76,6 +78,7 @@ app.use(
 //------------------------------------------------------API ROUTES----------------------------------------------------------------
 //*ROUTE CONNEXION ET INSCRIPTION
 const controllerAuth = require('./controllers/controllerAuth');
+const { sendErrorResponse } = require('./middleware/responseTemplate');
 app.post('/login', controllerAuth.login);
 app.post('/register', verifyJWT, controllerAuth.register);
 app.get('/islogged', verifyJWT, controllerAuth.isLogged);
@@ -89,6 +92,7 @@ app.use('/api/excel', excel_routes);
 app.use('/api/Gestionquiz', gestionquiz_routes);
 app.use('/api/gestionprix', gestionprix_routes);
 app.use('/api/order', order_routes);
+app.use('/api/pot', pot_routes);
 
 //*ROUTE POUR LE QUIZ
 app.use('/quiz', quiz_routes);
@@ -101,7 +105,13 @@ app.use('/cart', cart_routes);
 app.get('/', (req, res) => {
   res.send("Bienvenue sur l'api privé de RougyHorticulure");
 });
-
+app.use((req, res, next) => {
+  sendErrorResponse('Ressource introuvable', res, 404);
+});
+app.use((err, req, res, next) => {
+  console.error(err);
+  sendErrorResponse(err.message, res, 500);
+});
 //----------------------------------------------------END API ROUTES--------------------------------------------------------
 
 //demarrage server

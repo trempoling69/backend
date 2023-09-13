@@ -1,8 +1,8 @@
-const { Plante, configBdd, Price } = require('../utils/importbdd');
+const { Plante, configBdd, Price, Pot } = require('../utils/importbdd');
 const exportxlsx = require('../excelRequest/exportxlsx');
 const importxlsx = require('../excelRequest/importxlsx');
-const UtilSheetName = ['vivaces', 'annuelles', 'arbustes', 'prix'];
-const PlanteSheetName = ['vivaces', 'annuelles', 'arbustes'];
+const UtilSheetName = ['Vivaces', 'Annuelles', 'Arbustes', 'Prix', 'Pots'];
+const PlanteSheetName = ['Vivaces', 'Annuelles', 'Arbustes'];
 const uploadxlsx = require('../middleware/multerxlsx');
 const multer = require('multer');
 const { createHashPlante, createHashPrice } = require('../utils/hashimportbdd');
@@ -10,16 +10,20 @@ const fs = require('fs');
 const { checkInputExcel, checkInputExcelPrice } = require('../CheckInput/checkInputExcel');
 const { Op } = require('sequelize');
 
-const exportationxlsx = (req, res) => {
-  Price()
-    .findAll()
-    .then((prices) => {
-      Plante()
-        .findAll()
-        .then((plantes) => {
-          exportxlsx(res, plantes, UtilSheetName, prices);
-        });
-    });
+const exportationxlsx = async (req, res) => {
+  const exportPrice = await Price().findAll();
+  const exportPlante = await Plante().findAll();
+  const exportPot = await Pot().findAll();
+  exportxlsx(res, exportPlante, UtilSheetName, exportPrice, exportPot);
+  // Price()
+  //   .findAll()
+  //   .then((prices) => {
+  //     Plante()
+  //       .findAll()
+  //       .then((plantes) => {
+  //         exportxlsx(res, plantes, UtilSheetName, prices);
+  //       });
+  //   });
 };
 
 const importExcel = (req, res) => {
@@ -245,10 +249,10 @@ const importExcelPrix = (req, res) => {
         let buffer = req.file.buffer;
         importxlsx(buffer, (object) => {
           let promises = [];
-          if (object['prix'] == undefined) {
+          if (object['Prix'] == undefined) {
             logToFile('./logs/logs.txt', `La sheet prix n'existe pas`);
           } else {
-            object['prix'].map((price, index) => {
+            object['Prix'].map((price, index) => {
               let promise = new Promise((resolve, reject) => {
                 checkInputExcelPrice(price, index, logToFile, resolve, (checkPrice) => {
                   createHashPrice(checkPrice, (hashPrice) => {

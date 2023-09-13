@@ -10,6 +10,7 @@ const cleanedValue = (value) => {
   if (value === null) {
     return value;
   }
+  console.log(value);
   const cleanedValue = value.replace(/[<>]/g, '').trim();
   return cleanedValue;
 };
