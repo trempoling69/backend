@@ -31,22 +31,15 @@ const allPots = async (req, res, next) => {
   }
 };
 
-const createPot = (req, res, next) => {
+const createPot = async (req, res, next) => {
   try {
-    checkInputPot(req.body, res, (value) => {
-      Pot()
-        .create({
-          brand: value.brand,
-          size: value.size,
-          color: value.color,
-        })
-        .then(() => {
-          sendSuccessResponse('Pot bien enregistré', res, 201);
-        })
-        .catch((err) => {
-          throw err;
-        });
+    const { brand, size, color } = req.body;
+    await Pot().create({
+      brand,
+      size,
+      color,
     });
+    sendSuccessResponse('Pot bien enregistré', res, 201);
   } catch (err) {
     next(err);
   }
@@ -54,7 +47,7 @@ const createPot = (req, res, next) => {
 
 const deletePot = async (req, res, next) => {
   try {
-    const id = req.params.id;
+    const { id } = req.params;
     const findPot = await Pot().findOne({ where: { id: { [Op.eq]: id } } });
     if (findPot === null) {
       throw new Error('Aucun pot correspondant trouvé');
@@ -65,4 +58,22 @@ const deletePot = async (req, res, next) => {
     next(err);
   }
 };
-module.exports = { allPots, createPot, deletePot };
+
+const updatePot = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { brand, size, color } = req.body;
+    await Pot().update(
+      {
+        brand,
+        size,
+        color,
+      },
+      { where: { id: { [Op.eq]: id } } }
+    );
+    sendSuccessResponse('Pot modifié', res, 200);
+  } catch (err) {
+    next(err);
+  }
+};
+module.exports = { allPots, createPot, deletePot, updatePot };
