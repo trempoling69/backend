@@ -31,7 +31,9 @@ router.post('/other/modifprice', upload.none(), modifSpecificPrice); //!
 //* GENERAL REQUEST
 router.get('/getAllCategory', getAllCategory);
 router.get('/getAllPrice', getAllPrice);
+router.get('/get/:type', getAllPrice);
 router.get('/getprice/:category', getAllPriceOfCategory);
 router.delete('/deleteoneprice/:id', deleteOnePrice); //!
+
 
 module.exports = router;

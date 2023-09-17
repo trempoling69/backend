@@ -2,7 +2,6 @@ const { Pot, Plante } = require('../utils/importbdd');
 const { sendSuccessResponse } = require('../middleware/responseTemplate');
 const { Sequelize } = require('../models');
 const { Op } = require('sequelize');
-const checkInputPot = require('../CheckInput/checkInputPot');
 
 const allPots = async (req, res, next) => {
   try {

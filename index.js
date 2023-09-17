@@ -79,8 +79,10 @@ app.use(
 //*ROUTE CONNEXION ET INSCRIPTION
 const controllerAuth = require('./controllers/controllerAuth');
 const { sendErrorResponse } = require('./middleware/responseTemplate');
+const basicCheckUserInput = require('./middleware/basicCheckUserInput');
+const authSchema = require('./CheckInput/schema/auth');
 app.post('/login', controllerAuth.login);
-app.post('/register', verifyJWT, controllerAuth.register);
+app.post('/register', verifyJWT, basicCheckUserInput(authSchema.body.register, 'body'), controllerAuth.register);
 app.get('/islogged', verifyJWT, controllerAuth.isLogged);
 
 //*ROUTE GESTION API

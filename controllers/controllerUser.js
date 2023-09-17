@@ -1,6 +1,7 @@
 const { User } = require('../utils/importbdd');
 const { checkParamsId } = require('../CheckInput/checkParamsId');
 const { sendSuccessResponse } = require('../middleware/responseTemplate');
+const { Op } = require('sequelize');
 
 const getUser = (req, res, next) => {
   try {
@@ -19,34 +20,32 @@ const getAllUser = (_req, res, next) => {
         attributes: ['id', 'username', 'lastConn', 'role'],
       })
       .then((users) => {
-        res.json(users);
+        sendSuccessResponse(users, res, 200);
       });
   } catch (err) {
     next(err);
   }
 };
 
-const suppUser = (req, res) => {
-  checkParamsId(req, res, (data) => {
-    User()
-      .findOne({
-        attributes: ['id', 'role'],
-        where: { id: data.get('id') },
-      })
-      .then((user) => {
-        if (user.role == 'chef') {
-          res.status(400).send('Impossible de supprimer ce role');
-        } else {
-          User()
-            .destroy({
-              where: { id: data.get('id') },
-            })
-            .then(() => {
-              res.status(200).send('suppression réussi');
-            });
-        }
-      });
-  });
+const suppUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const userToDelete = await User().findOne({
+      attributes: ['id', 'role'],
+      where: { id: { [Op.eq]: id } },
+    });
+
+    if (userToDelete.role == 'chef') {
+      throw new Error('Impossible de supprimer cet utilisateur');
+    }
+    await User().destroy({
+      where: { id: { [Op.eq]: id } },
+    });
+
+    sendSuccessResponse('Utilisateur supprimé avec succès', res, 200);
+  } catch (err) {
+    next(err);
+  }
 };
 
 module.exports = { getUser, getAllUser, suppUser };

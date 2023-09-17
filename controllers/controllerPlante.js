@@ -201,54 +201,58 @@ const suppPlante = (req, res) => {
 };
 
 const insertOnePlante = (req, res) => {
-  if (
-    checkuserInputAdd(req.body, req.file, configBdd(), res, (data) => {
-      createHashPlante(data, (hashPlante) => {
-        Plante()
-          .create({
-            nom: data.get('nom'),
-            description: data.get('description'),
-            couleur_dispo: data.get('couleur_dispo'),
-            type: data.get('type'),
-            feuillage: data.get('feuillage'),
-            collection: data.get('collection'),
-            exposition: data.get('exposition'),
-            hauteur: data.get('hauteur'),
-            mois_floraison: data.get('mois_floraison'),
-            periode_floraison: data.get('periode_floraison'),
-            besoin_eau: data.get('besoin_eau'),
-            photo: data.get('photo'),
-            dispo: data.get('dispo'),
-            prix: data.get('prix'),
-            emplacement: data.get('emplacement'),
-            quantiteProd: data.get('quantiteProd'),
-            catchPhrase: data.get('catchPhrase'),
-            hashPlante: hashPlante,
-          })
-          .then((result) => {
-            res.status(200).send('plante ajouté');
-          })
-          .catch((err) => {
-            console.log(err);
-            res.status(400).send(err.message);
-          });
-      });
-    })
-  ) {
-    if (req.file !== undefined) {
-      fs.unlink(`images/${req.file.filename}`, (err) => {
-        if (err) {
-          console.log(err);
-          res.write('une erreur est survenu');
-          res.end();
-          return;
-        }
-        res.write(" . L'image n'a pas été enregistrée.");
-        res.end();
-      });
-    }
-    res.end();
-  }
+  // console.log(req);
+  console.log(req.file);
+  console.log(req.body);
+  res.status(400).json({ message: 'ok' });
+  // if (
+  //   checkuserInputAdd(req.body, req.file, configBdd(), res, (data) => {
+  //     createHashPlante(data, (hashPlante) => {
+  //       Plante()
+  //         .create({
+  //           nom: data.get('nom'),
+  //           description: data.get('description'),
+  //           couleur_dispo: data.get('couleur_dispo'),
+  //           type: data.get('type'),
+  //           feuillage: data.get('feuillage'),
+  //           collection: data.get('collection'),
+  //           exposition: data.get('exposition'),
+  //           hauteur: data.get('hauteur'),
+  //           mois_floraison: data.get('mois_floraison'),
+  //           periode_floraison: data.get('periode_floraison'),
+  //           besoin_eau: data.get('besoin_eau'),
+  //           photo: data.get('photo'),
+  //           dispo: data.get('dispo'),
+  //           prix: data.get('prix'),
+  //           emplacement: data.get('emplacement'),
+  //           quantiteProd: data.get('quantiteProd'),
+  //           catchPhrase: data.get('catchPhrase'),
+  //           hashPlante: hashPlante,
+  //         })
+  //         .then((result) => {
+  //           res.status(200).send('plante ajouté');
+  //         })
+  //         .catch((err) => {
+  //           console.log(err);
+  //           res.status(400).send(err.message);
+  //         });
+  //     });
+  //   })
+  // ) {
+  //   if (req.file !== undefined) {
+  //     fs.unlink(`images/${req.file.filename}`, (err) => {
+  //       if (err) {
+  //         console.log(err);
+  //         res.write('une erreur est survenu');
+  //         res.end();
+  //         return;
+  //       }
+  //       res.write(" . L'image n'a pas été enregistrée.");
+  //       res.end();
+  //     });
+  //   }
+  //   res.end();
+  // }
 };
 
 const modificationPlante = (req, res, photo) => {

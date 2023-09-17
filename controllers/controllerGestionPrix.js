@@ -1,17 +1,22 @@
-const { Sequelize } = require('sequelize');
+const { Sequelize, Op } = require('sequelize');
 const { Price, Plante } = require('../utils/importbdd');
 const checkInputPrice = require('../CheckInput/checkInputPrice');
+const { sendSuccessResponse } = require('../middleware/responseTemplate');
 
 //* REQUETE GENERAL
-
-const getAllPrice = (req, res) => {
-  Price()
-    .findAll()
-    .then((price) => {
-      res.json(price);
-    });
+const getAllPrice = async (req, res, next) => {
+  try {
+    const { type } = req.params;
+    let whereClause = {};
+    if (type !== 'all') {
+      whereClause = { type: { [Op.eq]: type } };
+    }
+    const allPrice = await Price().findAll({ where: whereClause });
+    sendSuccessResponse(allPrice, res, 200);
+  } catch (err) {
+    next(err);
+  }
 };
-
 const getAllCategory = (req, res) => {
   Price()
     .findAll({
@@ -246,7 +251,7 @@ const getAllPriceForSpe = (req, res) => {
           let formatedArray = [];
           formatedArray.push(
             priceWithoutPlante[0].map((price) => {
-              return { nombre_de_plantes: 0,nom: 'aucune plante', type:'aucun', fk_price: price };
+              return { nombre_de_plantes: 0, nom: 'aucune plante', type: 'aucun', fk_price: price };
             })
           );
           let arrayPrices = [...priceWithPlante[0], ...formatedArray[0]];

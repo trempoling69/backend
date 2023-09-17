@@ -4,6 +4,7 @@ var bcrypt = require('bcryptjs');
 var passport = require('passport');
 require('../middleware/passportConfig')(passport);
 const jwt = require('jsonwebtoken');
+const { sendSuccessResponse } = require('../middleware/responseTemplate');
 require('dotenv').config();
 
 exports.isLogged = (req, res) => {
@@ -11,26 +12,23 @@ exports.isLogged = (req, res) => {
   res.send(true);
 };
 
-exports.register = (req, res) => {
-  checkLoginInput(req, res, (data) => {
-    User()
-      .count({ where: { username: data.get('username') } })
-      .then(async (count) => {
-        if (count != 0) {
-          res.send('useralready exist');
-        } else {
-          const hashedpassword = await bcrypt.hash(data.get('password'), 10);
-          User()
-            .create({
-              username: data.get('username'),
-              password: hashedpassword,
-            })
-            .then(() => {
-              res.send('user created !');
-            });
-        }
+exports.register = async (req, res, next) => {
+  try {
+    const { username, password } = req.body;
+    const countUser = await User().count({ where: { username: username } });
+    if (countUser !== 0) {
+      throw new Error('Utilisateur déjà existant');
+    } else {
+      const hashedpassword = await bcrypt.hash(password, 10);
+      await User().create({
+        username,
+        password: hashedpassword,
       });
-  });
+      sendSuccessResponse('utilisateur créé avec succès', res, 200);
+    }
+  } catch (err) {
+    next(err);
+  }
 };
 
 exports.login = (req, res) => {
