@@ -24,6 +24,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   Plante.init(
     {
+      id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+        primaryKey: true,
+      },
       nom: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -64,7 +70,7 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       prix: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.UUID,
         references: {
           model: 'Prices',
           key: 'id',
@@ -74,7 +80,7 @@ module.exports = (sequelize, DataTypes) => {
       quantiteProd: DataTypes.INTEGER,
       catchPhrase: DataTypes.STRING,
       potId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.UUID,
         references: {
           model: 'Pots',
           key: 'id',
@@ -91,7 +97,6 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: 'Plante',
-      timestamps: false,
     }
   );
   return Plante;

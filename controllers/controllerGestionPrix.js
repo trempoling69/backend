@@ -2,6 +2,9 @@ const { Sequelize, Op } = require('sequelize');
 const { Price, Plante } = require('../utils/importbdd');
 const checkInputPrice = require('../CheckInput/checkInputPrice');
 const { sendSuccessResponse } = require('../middleware/responseTemplate');
+const checkSchema = require('../CheckInput/checkSchema');
+const priceSchema = require('../CheckInput/schema/price');
+const { createHashPrice } = require('../utils/hashimportbdd');
 
 //* REQUETE GENERAL
 const getAllPrice = async (req, res, next) => {
@@ -199,6 +202,7 @@ const addNewPriceToNewCat = (req, res) => {
         usualname: data.get('usualname'),
         type: 'BP',
         category: data.get('category'),
+        hashPrice: 'coucoumongrand' //! ATTENTION LA
       })
       .then(() => {
         res.status(200).json('ok');
@@ -289,6 +293,38 @@ const modifSpecificPrice = (req, res) => {
   });
 };
 
+const addNewPrice = async (value) => {
+  try {
+    const checkValue = await new Promise((resolve, _reject) => {
+      checkSchema(value, priceSchema.body.addPrice, (result) => {
+        resolve(result);
+      });
+    });
+    const hashPrice = createHashPrice(checkValue);
+    const prix = await Price().create({
+      name: checkValue.name,
+      usualname: checkValue.usualname,
+      amount: checkValue.amount,
+      type: checkValue.type,
+      hashPrice: hashPrice,
+    });
+    return prix;
+  } catch (err) {
+    throw new Error('erreur lors de la création de prix');
+  }
+};
+
+const deletePrice = async (id) => {
+  try {
+    const priceToDelete = await Price().findOne({ where: { id: { [Op.eq]: id } } });
+    if (priceToDelete === null) {
+      throw new Error('Pas de prix avec cet id');
+    }
+    await Price().destroy({ where: { id: { [Op.eq]: id } } });
+  } catch (err) {
+    throw new Error(err);
+  }
+};
 module.exports = {
   getAllCategory,
   getAllPriceOfCategory,
@@ -301,4 +337,6 @@ module.exports = {
   addNewPriceToNewCat,
   deleteOnePrice,
   modifSpecificPrice,
+  addNewPrice,
+  deletePrice,
 };

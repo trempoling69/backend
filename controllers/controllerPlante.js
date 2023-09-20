@@ -8,6 +8,10 @@ const fs = require('fs');
 const { createHashPlante, createHashPrice } = require('../utils/hashimportbdd');
 const checkInputPriceForPlante = require('../CheckInput/checkInputPriceForPlante');
 const { sendSuccessResponse, sendErrorResponse } = require('../middleware/responseTemplate');
+const checkSchema = require('../CheckInput/checkSchema');
+const priceSchema = require('../CheckInput/schema/price');
+const { addNewPrice } = require('./controllerGestionPrix');
+const planteSchema = require('../CheckInput/schema/plante');
 
 const allPlantes = (req, res, next) => {
   try {
@@ -42,41 +46,44 @@ const planteById = (req, res) => {
     });
 };
 
-const insertPlante = (req, res) => {
-  upload(req, res, (err) => {
-    if (err instanceof multer.MulterError) {
-      console.log(err);
-      res.status(400).send(err.code);
-    } else if (err) {
-      console.log(err.message);
-      res.status(400).send(err.message);
-    } else {
-      if (req.body.prix === 'new') {
-        if (
-          checkInputPriceForPlante(req.body, res, (checkedValue) => {
-            createHashPrice(checkedValue, (hashPrice) => {
-              Price()
-                .create({
-                  name: `Prix_${checkedValue.get('nom')}`,
-                  usualname: `Prix pour ${checkedValue.get('nom')}`,
-                  amount: checkedValue.get('newPrice'),
-                  type: 'OTHER',
-                  hashPrice: hashPrice,
-                })
-                .then((prix) => {
-                  req.body.prix = prix.id;
-                  insertOnePlante(req, res);
-                });
-            });
-          })
-        ) {
-          res.end();
-        }
-      } else {
-        insertOnePlante(req, res);
-      }
+const insertPlante = async (req, res, next) => {
+  try {
+    if (!isNaN(Number(req.body.prix)) && req.body.prix !== null) {
+      const valuePrice = {
+        name: `Prix_${req.body.nom}`,
+        usualname: `Prix pour ${req.body.nom}`,
+        amount: Number(req.body.prix),
+        type: 'OTHER',
+      };
+      const priceCreate = await addNewPrice(valuePrice);
+      req.body.prix = priceCreate.id;
+      req.body.priceCreate = true;
     }
-  });
+    const valuePlante = {
+      nom: req.body.nom,
+      type: req.body.type,
+      description: req.body.description,
+      catchPhrase: req.body.catchPhrase,
+      collection: req.body.collection,
+      mois_floraison: req.body.mois_floraison,
+      periode_floraison: req.body.periode_floraison,
+      hauteur: req.body.hauteur,
+      couleur_dispo: req.body.couleur_dispo,
+      feuillage: req.body.feuillage,
+      besoin_eau: req.body.besoin_eau,
+      exposition: req.body.exposition,
+      emplacement: req.body.emplacement,
+      pot: req.body.pot,
+      prix: req.body.prix,
+      quantiteProd: req.body.quantiteProd,
+      dispo: req.body.dispo,
+      photo: req.file?.filename,
+    };
+    await insertOnePlante(valuePlante);
+    sendSuccessResponse('Plante ajouté avec succès', res, 201);
+  } catch (err) {
+    next(err);
+  }
 };
 
 const modifPlante = (req, res, next) => {
@@ -200,59 +207,40 @@ const suppPlante = (req, res) => {
   });
 };
 
-const insertOnePlante = (req, res) => {
-  // console.log(req);
-  console.log(req.file);
-  console.log(req.body);
-  res.status(400).json({ message: 'ok' });
-  // if (
-  //   checkuserInputAdd(req.body, req.file, configBdd(), res, (data) => {
-  //     createHashPlante(data, (hashPlante) => {
-  //       Plante()
-  //         .create({
-  //           nom: data.get('nom'),
-  //           description: data.get('description'),
-  //           couleur_dispo: data.get('couleur_dispo'),
-  //           type: data.get('type'),
-  //           feuillage: data.get('feuillage'),
-  //           collection: data.get('collection'),
-  //           exposition: data.get('exposition'),
-  //           hauteur: data.get('hauteur'),
-  //           mois_floraison: data.get('mois_floraison'),
-  //           periode_floraison: data.get('periode_floraison'),
-  //           besoin_eau: data.get('besoin_eau'),
-  //           photo: data.get('photo'),
-  //           dispo: data.get('dispo'),
-  //           prix: data.get('prix'),
-  //           emplacement: data.get('emplacement'),
-  //           quantiteProd: data.get('quantiteProd'),
-  //           catchPhrase: data.get('catchPhrase'),
-  //           hashPlante: hashPlante,
-  //         })
-  //         .then((result) => {
-  //           res.status(200).send('plante ajouté');
-  //         })
-  //         .catch((err) => {
-  //           console.log(err);
-  //           res.status(400).send(err.message);
-  //         });
-  //     });
-  //   })
-  // ) {
-  //   if (req.file !== undefined) {
-  //     fs.unlink(`images/${req.file.filename}`, (err) => {
-  //       if (err) {
-  //         console.log(err);
-  //         res.write('une erreur est survenu');
-  //         res.end();
-  //         return;
-  //       }
-  //       res.write(" . L'image n'a pas été enregistrée.");
-  //       res.end();
-  //     });
-  //   }
-  //   res.end();
-  // }
+const insertOnePlante = async (value) => {
+  try {
+    const checkValue = await new Promise((resolve, _reject) => {
+      checkSchema(value, planteSchema.body.object, (result) => {
+        resolve(result);
+      });
+    });
+    const hashPlante = createHashPlante(checkValue);
+    const plante = await Plante().create({
+      nom: checkValue.nom,
+      description: checkValue.description,
+      couleur_dispo: checkValue.couleur_dispo,
+      type: checkValue.type,
+      feuillage: checkValue.feuillage,
+      collection: checkValue.collection,
+      exposition: checkValue.exposition,
+      hauteur: checkValue.hauteur,
+      mois_floraison: checkValue.mois_floraison,
+      periode_floraison: checkValue.periode_floraison,
+      besoin_eau: checkValue.besoin_eau,
+      photo: checkValue.photo,
+      dispo: checkValue.dispo,
+      prix: checkValue.prix,
+      emplacement: checkValue.emplacement,
+      quantiteProd: checkValue.quantiteProd,
+      catchPhrase: checkValue.catchPhrase,
+      potId: checkValue.pot,
+      photo: checkValue.photo,
+      hashPlante: hashPlante,
+    });
+    return plante;
+  } catch (err) {
+    throw new Error('Erreur lors de la création de la plante');
+  }
 };
 
 const modificationPlante = (req, res, photo) => {

@@ -1,6 +1,6 @@
 const Joi = require('joi');
 
-const authSchema = {
+const priceSchema = {
   params: Joi.object({
     id: Joi.number()
       .required()
@@ -19,51 +19,14 @@ const authSchema = {
   }),
 
   body: {
-    register: Joi.object({
-      username: Joi.string()
-        .required()
-        .error((errors) => {
-          errors.forEach((err) => {
-            switch (err.code) {
-              case 'string.empty':
-                err.message = 'Le username ne peut pas être vide';
-                break;
-              default:
-                break;
-            }
-          });
-          return errors;
-        }),
-      password: Joi.string()
-        .required()
-        .error((errors) => {
-          errors.forEach((err) => {
-            switch (err.code) {
-              case 'string.empty':
-                err.message = 'Le mot de passe ne peut pas être vide';
-                break;
-              default:
-                break;
-            }
-          });
-          return errors;
-        }),
-      confirmPassword: Joi.string()
-        .required()
-        .error((errors) => {
-          errors.forEach((err) => {
-            switch (err.code) {
-              case 'string.empty':
-                err.message = 'La confirmation ne peut pas être vide';
-                break;
-              default:
-                break;
-            }
-          });
-          return errors;
-        }),
+    addPrice: Joi.object({
+      name: Joi.string().required(),
+      usualname: Joi.string().required(),
+      amount: Joi.number().required(),
+      type: Joi.string().valid('OTHER', 'BP'),
+      category: Joi.alternatives(Joi.string(), Joi.allow(null)),
     }),
   },
 };
 
-module.exports = authSchema;
+module.exports = priceSchema;

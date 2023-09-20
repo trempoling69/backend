@@ -13,6 +13,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   Price.init(
     {
+      id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+        primaryKey: true,
+      },
       name: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -46,7 +52,6 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: 'Price',
-      timestamps: false,
     }
   );
   return Price;

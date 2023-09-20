@@ -17,6 +17,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   Pot.init(
     {
+      id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+        primaryKey: true,
+      },
       size: DataTypes.INTEGER,
       color: DataTypes.STRING,
       brand: DataTypes.STRING,

@@ -1,8 +1,8 @@
-const Joi = require('joi');
 const cleanedValue = (value) => {
   const cleanedValue = value.replace(/[<>]/g, '').trim();
   return cleanedValue;
 };
+
 function cleanValue(value) {
   if (typeof value === 'string') {
     value = cleanedValue(value);
@@ -16,20 +16,18 @@ function cleanValue(value) {
     }
   }
 }
-const basicCheckUserInput = (schema, property) => {
-  return (req, _res, next) => {
-    cleanValue(req[property]);
-    const { error } = schema.validate(req[property]);
-    const valid = error == null;
 
-    if (valid) {
-      next();
-    } else {
-      const { details } = error;
-      const message = details.map((i) => i.message).join(',');
-      throw new Error(message);
-    }
-  };
+const checkSchema = (value, schema, callback) => {
+  cleanValue(value);
+  const { error } = schema.validate(value);
+  const valid = error == null;
+  if (valid) {
+    callback(value);
+  } else {
+    const { details } = error;
+    const message = details.map((i) => i.message).join(',');
+    throw new Error(message);
+  }
 };
 
-module.exports = basicCheckUserInput;
+module.exports = checkSchema;
