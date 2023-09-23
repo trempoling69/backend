@@ -20,9 +20,9 @@ const quiz_routes = require('./routes/quiz');
 const gestionquiz_routes = require('./routes/modifQuiz');
 const price_routes = require('./routes/price');
 const cart_routes = require('./routes/cart');
-const gestionprix_routes = require('./routes/gestionPrix');
 const order_routes = require('./routes/order');
 const pot_routes = require('./routes/pot');
+const categoryPrice_routes = require('./routes/categoryPrice');
 //-----------------------------------------------HEBERGEMENT-----------------------------------------------------------------------------
 // if (typeof PhusionPassenger !== "undefined") {
 //   PhusionPassenger.configure({ autoInstall: false });
@@ -36,6 +36,7 @@ const pot_routes = require('./routes/pot');
 // });
 //------------------------------------------GESTION BASE DE DONNEE------------------------------------------------------
 var models = require('./models/index');
+models.CategoryPrice.sync();
 models.Price.sync();
 models.Pot.sync();
 models.User.sync();
@@ -81,6 +82,7 @@ const controllerAuth = require('./controllers/controllerAuth');
 const { sendErrorResponse } = require('./middleware/responseTemplate');
 const basicCheckUserInput = require('./middleware/basicCheckUserInput');
 const authSchema = require('./CheckInput/schema/auth');
+const createCategory = require('./controllers/controllerCategoryPrice');
 app.post('/login', controllerAuth.login);
 app.post('/register', verifyJWT, basicCheckUserInput(authSchema.body.register, 'body'), controllerAuth.register);
 app.get('/islogged', verifyJWT, controllerAuth.isLogged);
@@ -92,17 +94,16 @@ app.use('/api/stats', info_routes);
 app.use('/api/plante', plante_routes);
 app.use('/api/excel', excel_routes);
 app.use('/api/Gestionquiz', gestionquiz_routes);
-app.use('/api/gestionprix', gestionprix_routes);
+app.use('/api/price', price_routes);
 app.use('/api/order', order_routes);
 app.use('/api/pot', pot_routes);
+app.use('/api/categoryprice', categoryPrice_routes);
 
 //*ROUTE POUR LE QUIZ
 app.use('/quiz', quiz_routes);
 
 //*ROUTE POUR L'APP
-app.use('/price', price_routes);
 app.use('/cart', cart_routes);
-
 //*ROUTE BASIQUE
 app.get('/', (req, res) => {
   res.send("Bienvenue sur l'api privé de RougyHorticulure");

@@ -8,7 +8,15 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      Price.hasMany(models.Plante, {
+        foreignKey: 'prix',
+        as: 'fk_plante',
+      });
+
+      Price.belongsTo(models.CategoryPrice, {
+        foreignKey: 'categoryId',
+        as: 'fk_category',
+      });
     }
   }
   Price.init(
@@ -36,10 +44,14 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         validate: { isIn: [['BP', 'OTHER']] },
       },
-      category: {
-        type: DataTypes.STRING,
+      categoryId: {
+        type: DataTypes.UUID,
         allowNull: true,
         defaultValue: null,
+        references: {
+          model: 'CategoryPrices',
+          key: 'id',
+        },
       },
       hashPrice: {
         type: DataTypes.STRING,

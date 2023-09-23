@@ -12,10 +12,9 @@ const {
 const basicCheckUserInput = require('../middleware/basicCheckUserInput');
 const planteSchema = require('../CheckInput/schema/plante');
 const upload = require('../middleware/multer');
-const { sendErrorResponse } = require('../middleware/responseTemplate');
 const multer = require('multer');
 const fs = require('fs');
-const { deletePrice } = require('../controllers/controllerGestionPrix');
+const { deletePrice } = require('../services/price');
 
 const managePhoto = (req, res, next) => {
   upload(req, res, (err) => {

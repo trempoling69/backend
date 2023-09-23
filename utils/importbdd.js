@@ -111,3 +111,7 @@ exports.Cart = () => {
 exports.Pot = () => {
   return models.Pot;
 };
+
+exports.CategoryPrice = () => {
+  return models.CategoryPrice;
+};

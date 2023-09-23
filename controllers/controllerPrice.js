@@ -1,23 +1,124 @@
-const { Price } = require('../utils/importbdd');
+const { Sequelize, Op } = require('sequelize');
+const { Price, Plante, CategoryPrice } = require('../utils/importbdd');
+const { sendSuccessResponse } = require('../middleware/responseTemplate');
+const { findAllPriceWithOneCategory, createNewCategory, deleteOneCategory } = require('../services/categoryPrice');
+const { createPrice, updatePrice, findOnePrice, deleteOnePrice } = require('../services/price');
 
-const getAllPrice = (req, res) => {
-  const category = req.params.category;
-  Price()
-    .findAll({ where: { category } })
-    .then((price) => {
-      res.json(price);
+const getPriceWithFk = async (req, res, next) => {
+  try {
+    const { type } = req.params;
+    let whereClause = {};
+    if (type !== 'all') {
+      whereClause = { type: { [Op.eq]: type } };
+    }
+    const price = await Price().findAll({
+      where: whereClause,
+      attributes: [
+        'id',
+        'name',
+        'amount',
+        'usualname',
+        'type',
+        [Sequelize.col('fk_category.name'), 'categoryName'],
+        [Sequelize.col('fk_category.id'), 'categoryId'],
+        [Sequelize.fn('COALESCE', Sequelize.fn('COUNT', Sequelize.col('fk_plante.id')), 0), 'useFor'],
+      ],
+      include: [
+        {
+          model: Plante(),
+          attributes: [],
+          required: false,
+          as: 'fk_plante',
+        },
+        { model: CategoryPrice(), attributes: [], as: 'fk_category' },
+      ],
+      group: ['Price.id'],
     });
+    sendSuccessResponse(price, res, 200);
+  } catch (err) {
+    next(err);
+  }
 };
 
-const getAllCategory = (req, res) => {
-  Price()
-    .findAll({
-      attributes: ['category'],
-      group: ['category'],
-    })
-    .then((category) => {
-      res.json(category);
-    });
+const postCreatePrice = async (req, res, next) => {
+  try {
+    let categoryId = req.body.categoryId;
+    if (categoryId === 'new') {
+      const value = {
+        name: req.body.categoryName,
+      };
+      const category = await createNewCategory(value);
+      categoryId = category.id;
+    }
+    const value = {
+      name: req.body.name,
+      usualname: req.body.usualname,
+      amount: req.body.amount,
+      type: 'BP',
+      categoryId: categoryId,
+    };
+    await createPrice(value);
+    sendSuccessResponse('Prix créé avec succès', res, 201);
+  } catch (err) {
+    next(err);
+  }
 };
 
-module.exports = { getAllPrice, getAllCategory };
+const getAllPrice = async (req, res, next) => {
+  try {
+    const { type } = req.params;
+    let whereClause = {};
+    if (type !== 'all') {
+      whereClause = { type: { [Op.eq]: type } };
+    }
+    const allPrice = await Price().findAll({ where: whereClause });
+    sendSuccessResponse(allPrice, res, 200);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const modifyPrice = async (req, res, next) => {
+  try {
+    let categoryId = req.body.categoryId;
+    if (categoryId === 'new') {
+      const value = {
+        name: req.body.categoryName,
+      };
+      const category = await createNewCategory(value);
+      categoryId = category.id;
+    }
+    const value = {
+      name: req.body.name,
+      usualname: req.body.usualname,
+      amount: req.body.amount,
+      type: req.params.type,
+      categoryId: categoryId,
+    };
+    await updatePrice(req.params.id, value);
+    sendSuccessResponse('Prix modifié avec succès', res, 200);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const deletePrice = async (req, res, next) => {
+  try {
+    const priceToDelete = await findOnePrice(req.params.id);
+    const findAllPrice = await findAllPriceWithOneCategory(priceToDelete.categoryId);
+    if (findAllPrice[0].get('useBy') === 1) {
+      await deleteOneCategory(priceToDelete.categoryId);
+    }
+    await deleteOnePrice(priceToDelete.id);
+    sendSuccessResponse('succes', res, 200);
+  } catch (err) {
+    next(err);
+  }
+};
+module.exports = {
+  getPriceWithFk,
+  postCreatePrice,
+  getAllPrice,
+  modifyPrice,
+  deletePrice,
+};

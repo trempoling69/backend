@@ -1,30 +1,32 @@
 const Joi = require('joi');
 
 const priceSchema = {
-  params: Joi.object({
-    id: Joi.number()
-      .required()
-      .error((errors) => {
-        errors.forEach((err) => {
-          switch (err.code) {
-            case 'number.base':
-              err.message = "L'id doit être un nombre";
-              break;
-            default:
-              break;
-          }
-        });
-        return errors;
-      }),
-  }),
-
+  params: {
+    id: Joi.object({
+      id: Joi.string().required(),
+    }),
+    type: Joi.object({
+      type: Joi.string().valid('OTHER', 'BP', 'all'),
+    }),
+    both: Joi.object({
+      id: Joi.string().required(),
+      type: Joi.string().valid('OTHER', 'BP', 'all'),
+    }),
+  },
   body: {
-    addPrice: Joi.object({
+    price: Joi.object({
       name: Joi.string().required(),
       usualname: Joi.string().required(),
       amount: Joi.number().required(),
       type: Joi.string().valid('OTHER', 'BP'),
-      category: Joi.alternatives(Joi.string(), Joi.allow(null)),
+      categoryId: Joi.alternatives(Joi.string(), Joi.allow(null)),
+    }),
+    requestAdd: Joi.object({
+      name: Joi.string().required(),
+      usualname: Joi.string().required(),
+      amount: Joi.number().required(),
+      categoryId: Joi.alternatives(Joi.string(), Joi.allow(null)),
+      categoryName: Joi.alternatives(Joi.string().optional(), Joi.allow(null)),
     }),
   },
 };
