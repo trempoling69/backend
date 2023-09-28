@@ -3,20 +3,7 @@ const Joi = require('joi');
 const planteSchema = {
   params: {
     object: Joi.object({
-      id: Joi.number()
-        .required()
-        .error((errors) => {
-          errors.forEach((err) => {
-            switch (err.code) {
-              case 'number.base':
-                err.message = "L'id doit être un nombre";
-                break;
-              default:
-                break;
-            }
-          });
-          return errors;
-        }),
+      id: Joi.string().required(),
     }),
   },
   body: {
@@ -38,7 +25,11 @@ const planteSchema = {
       prix: Joi.alternatives(Joi.string(), Joi.allow(null)),
       quantiteProd: Joi.alternatives(Joi.string(), Joi.allow(null)),
       dispo: Joi.boolean(),
-      photo: Joi.string(),
+      photo: Joi.alternatives(Joi.string(), Joi.allow(null)),
+    }),
+    toggleDispo: Joi.object({
+      id: Joi.string().required(),
+      dispo: Joi.boolean().required(),
     }),
   },
 };

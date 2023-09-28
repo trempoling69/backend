@@ -5,9 +5,9 @@ const {
   allPlantes,
   planteById,
   insertPlante,
-  modifPlante,
   toggleDispo,
   suppPlante,
+  updatePlant,
 } = require('../controllers/controllerPlante');
 const basicCheckUserInput = require('../middleware/basicCheckUserInput');
 const planteSchema = require('../CheckInput/schema/plante');
@@ -19,16 +19,14 @@ const { deletePrice } = require('../services/price');
 const managePhoto = (req, res, next) => {
   upload(req, res, (err) => {
     if (err instanceof multer.MulterError) {
-      console.log('eerror', err);
       throw new Error(err.code);
     } else if (err) {
-      console.log('eerr', err.message);
       throw new Error(err.message);
     }
     next();
   });
 };
-const deleteUploadedPhotoOnError = async (err, req, res, next) => {
+const deleteUploadedPhotoOnError = async (err, req, _res, next) => {
   if (err) {
     if (req.file) {
       const filePath = req.file.path;
@@ -44,7 +42,7 @@ const deleteUploadedPhotoOnError = async (err, req, res, next) => {
   }
   next(err);
 };
-const changeForNullInput = (req, res, next) => {
+const changeForNullInput = (req, _res, next) => {
   for (const key in req.body) {
     if (req.body[key] === 'null') {
       req.body[key] = null;
@@ -60,10 +58,18 @@ router.post(
   insertPlante,
   deleteUploadedPhotoOnError
 );
-router.post('/modifplante', modifPlante);
-router.post('/toggledispo', toggleDispo);
-router.delete('/supprimerplante/:id', suppPlante);
-router.get('/byid/:id', planteById);
+router.put(
+  '/updateplant/:id',
+  managePhoto,
+  changeForNullInput,
+  basicCheckUserInput(planteSchema.params.object, 'params'),
+  basicCheckUserInput(planteSchema.body.object, 'body'),
+  updatePlant,
+  deleteUploadedPhotoOnError
+);
+router.post('/toggledispo', basicCheckUserInput(planteSchema.body.toggleDispo, 'body'), toggleDispo);
+router.delete('/deleteplant/:id', basicCheckUserInput(planteSchema.params.object, 'params'), suppPlante);
+router.get('/byid/:id', basicCheckUserInput(planteSchema.params.object, 'params'), planteById);
 router.get('/allPlante', allPlantes);
 
 module.exports = router;
