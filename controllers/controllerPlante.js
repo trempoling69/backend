@@ -127,6 +127,7 @@ const updatePlant = async (req, res, next) => {
     next(err);
   }
 };
+
 const modifPlante = (req, res, next) => {
   upload(req, res, (err) => {
     if (err instanceof multer.MulterError) {

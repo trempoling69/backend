@@ -115,3 +115,11 @@ exports.Pot = () => {
 exports.CategoryPrice = () => {
   return models.CategoryPrice;
 };
+
+exports.Collection = () => {
+  return models.Collection;
+};
+
+exports.Type = () => {
+  return models.Type;
+};

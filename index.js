@@ -36,17 +36,10 @@ const categoryPrice_routes = require('./routes/categoryPrice');
 // });
 //------------------------------------------GESTION BASE DE DONNEE------------------------------------------------------
 var models = require('./models/index');
-models.CategoryPrice.sync();
-models.Price.sync();
-models.Pot.sync();
-models.User.sync();
-models.Reponse.sync();
-models.Plante.sync();
-models.Question.sync();
-models.Cart.sync();
-// models.sequelize.sync().then(()=>{
-//   console.log('bdd synchorinise');
-// })
+const syncTable = async () => {
+  await models.sequelize.sync();
+};
+syncTable();
 //------------------------------------------------------FIN GESTION BASE DE DONNEE-------------------------------------------------
 //*CONFIG SERVER
 // const limiter = rateLimit({

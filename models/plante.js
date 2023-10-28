@@ -9,14 +9,26 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       Plante.belongsTo(models.Price, {
-        foreignKey: 'prix',
+        foreignKey: 'price_id',
         as: 'fk_price',
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       });
       Plante.belongsTo(models.Pot, {
-        foreignKey: 'potId',
+        foreignKey: 'pot_id',
         as: 'fk_pot',
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+      });
+      Plante.belongsTo(models.Type, {
+        foreignKey: 'type_id',
+        as: 'fk_type',
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+      });
+      Plante.belongsTo(models.Collection, {
+        foreignKey: 'collection_id',
+        as: 'fk_collection',
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       });
@@ -30,7 +42,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         primaryKey: true,
       },
-      nom: {
+      name: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
@@ -44,23 +56,36 @@ module.exports = (sequelize, DataTypes) => {
           notEmpty: true,
         },
       },
-      couleur_dispo: DataTypes.STRING,
-      type: {
-        type: DataTypes.STRING,
-        allowNull: false,
+      color_available: DataTypes.STRING,
+      type_id: {
+        type: DataTypes.UUID,
+        references: {
+          model: 'Types',
+          key: 'id',
+        },
         validate: {
           notEmpty: true,
         },
       },
       feuillage: DataTypes.STRING,
-      collection: DataTypes.STRING,
-      exposition: DataTypes.STRING,
+      collection_id: {
+        type: DataTypes.UUID,
+        references: {
+          model: 'Collections',
+          key: 'id',
+        },
+      },
+      exposition: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        validate: { isIn: [['Soleil', 'Ombre', 'Mi-ombre', 'Polyvalent']] },
+      },
       hauteur: DataTypes.STRING,
       mois_floraison: DataTypes.STRING,
       periode_floraison: DataTypes.STRING,
       besoin_eau: DataTypes.STRING,
-      photo: DataTypes.STRING,
-      dispo: {
+      picture: DataTypes.STRING,
+      availability: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
         allowNull: false,
@@ -69,7 +94,7 @@ module.exports = (sequelize, DataTypes) => {
           isIn: [[0, 1, true, false]],
         },
       },
-      prix: {
+      price_id: {
         type: DataTypes.UUID,
         references: {
           model: 'Prices',
@@ -78,8 +103,8 @@ module.exports = (sequelize, DataTypes) => {
       },
       emplacement: DataTypes.STRING,
       quantiteProd: DataTypes.INTEGER,
-      catchPhrase: DataTypes.STRING,
-      potId: {
+      catchphrase: DataTypes.STRING,
+      pot_id: {
         type: DataTypes.UUID,
         references: {
           model: 'Pots',

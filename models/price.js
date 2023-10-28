@@ -9,12 +9,12 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       Price.hasMany(models.Plante, {
-        foreignKey: 'prix',
+        foreignKey: 'price_id',
         as: 'fk_plante',
       });
 
       Price.belongsTo(models.CategoryPrice, {
-        foreignKey: 'categoryId',
+        foreignKey: 'category_id',
         as: 'fk_category',
       });
     }
@@ -44,7 +44,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         validate: { isIn: [['BP', 'OTHER']] },
       },
-      categoryId: {
+      category_id: {
         type: DataTypes.UUID,
         allowNull: true,
         defaultValue: null,
