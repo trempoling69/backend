@@ -11,7 +11,6 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       Pot.hasMany(models.Plante, {
         foreignKey: 'pot_id',
-        as: 'fk_plante',
       });
     }
   }

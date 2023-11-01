@@ -42,5 +42,5 @@ const multerupload = multer({
 
 
 //exportation du middleware 
-module.exports = multerupload.single('photo');
+module.exports = multerupload.single('picture');
 

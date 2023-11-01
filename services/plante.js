@@ -26,29 +26,29 @@ const insertOnePlante = async (value) => {
     });
     const hashPlante = createHashPlante(checkValue);
     const plante = await Plante().create({
-      nom: checkValue.nom,
+      name: checkValue.name,
       description: checkValue.description,
-      couleur_dispo: checkValue.couleur_dispo,
-      type: checkValue.type,
+      color_available: checkValue.color_available,
+      type_id: checkValue.type_id,
       feuillage: checkValue.feuillage,
-      collection: checkValue.collection,
+      collection_id: checkValue.collection_id,
       exposition: checkValue.exposition,
       hauteur: checkValue.hauteur,
       mois_floraison: checkValue.mois_floraison,
       periode_floraison: checkValue.periode_floraison,
       besoin_eau: checkValue.besoin_eau,
-      photo: checkValue.photo,
-      dispo: checkValue.dispo,
-      prix: checkValue.prix,
+      picture: checkValue.picture,
+      availability: checkValue.availability,
+      price_id: checkValue.price_id,
       emplacement: checkValue.emplacement,
       quantiteProd: checkValue.quantiteProd,
-      catchPhrase: checkValue.catchPhrase,
-      potId: checkValue.pot,
-      photo: checkValue.photo,
+      catchphrase: checkValue.catchphrase,
+      pot_id: checkValue.pot_id,
       hashPlante: hashPlante,
     });
     return plante;
   } catch (err) {
+    console.log(err);
     throw new Error('Erreur lors de la création de la plante');
   }
 };
@@ -69,25 +69,24 @@ const updateOnePlant = async (value, id) => {
     const hashPlante = createHashPlante(checkValue);
     const plant = await Plante().update(
       {
-        nom: checkValue.nom,
+        name: checkValue.name,
         description: checkValue.description,
-        couleur_dispo: checkValue.couleur_dispo,
-        type: checkValue.type,
+        color_available: checkValue.color_available,
+        type_id: checkValue.type_id,
         feuillage: checkValue.feuillage,
-        collection: checkValue.collection,
+        collection_id: checkValue.collection_id,
         exposition: checkValue.exposition,
         hauteur: checkValue.hauteur,
         mois_floraison: checkValue.mois_floraison,
         periode_floraison: checkValue.periode_floraison,
         besoin_eau: checkValue.besoin_eau,
-        photo: checkValue.photo,
-        dispo: checkValue.dispo,
-        prix: checkValue.prix,
+        picture: checkValue.picture,
+        availability: checkValue.availability,
+        price_id: checkValue.price_id,
         emplacement: checkValue.emplacement,
         quantiteProd: checkValue.quantiteProd,
-        catchPhrase: checkValue.catchPhrase,
-        potId: checkValue.pot,
-        photo: checkValue.photo,
+        catchphrase: checkValue.catchphrase,
+        pot_id: checkValue.pot_id,
         hashPlante: hashPlante,
       },
       { where: { id: { [Op.eq]: plantToModify.id } } }

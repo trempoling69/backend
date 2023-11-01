@@ -10,7 +10,6 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       CategoryPrice.hasMany(models.Price, {
         foreignKey: 'category_id',
-        as: 'fk_price',
       });
     }
   }

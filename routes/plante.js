@@ -44,9 +44,7 @@ const deleteUploadedPhotoOnError = async (err, req, _res, next) => {
 };
 const changeForNullInput = (req, _res, next) => {
   for (const key in req.body) {
-    if (req.body[key] === 'null') {
-      req.body[key] = null;
-    }
+    req.body[key] = JSON.parse(req.body[key]);
   }
   next();
 };
@@ -54,7 +52,7 @@ router.post(
   '/insertplante',
   managePhoto,
   changeForNullInput,
-  basicCheckUserInput(planteSchema.body.object, 'body'),
+  basicCheckUserInput(planteSchema.body.request, 'body'),
   insertPlante,
   deleteUploadedPhotoOnError
 );
@@ -63,7 +61,7 @@ router.put(
   managePhoto,
   changeForNullInput,
   basicCheckUserInput(planteSchema.params.object, 'params'),
-  basicCheckUserInput(planteSchema.body.object, 'body'),
+  basicCheckUserInput(planteSchema.body.request, 'body'),
   updatePlant,
   deleteUploadedPhotoOnError
 );

@@ -77,4 +77,33 @@ const updatePrice = async (id, value) => {
   }
 };
 
-module.exports = { deleteOnePrice, createPrice, updatePrice, findOnePrice };
+const updateAmountPrice = async (id, amount) => {
+  try {
+    if (isNaN(parseFloat(amount))) {
+      throw new Error('need a number');
+    }
+    const priceToModify = await findOnePrice(id);
+    if (priceToModify === null) {
+      throw new Error();
+    }
+    if (priceToModify.amount === amount) {
+      return priceToModify;
+    }
+    const hashPrice = createHashPrice({ ...priceToModify, amount: amount });
+    const priceUpdate = await Price().update(
+      {
+        amount,
+        hashPrice,
+      },
+      { where: { id: { [Op.eq]: priceToModify.id } }}
+    );
+    if (!priceUpdate) throw ('Error while Updating');
+    const newPrice = await findOnePrice(id);
+    return newPrice;
+  } catch (err) {
+    console.log(err);
+    throw new Error('Erreur lors de la modification de la valeur du prix');
+  }
+};
+
+module.exports = { deleteOnePrice, createPrice, updatePrice, findOnePrice, updateAmountPrice };

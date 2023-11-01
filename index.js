@@ -23,6 +23,8 @@ const cart_routes = require('./routes/cart');
 const order_routes = require('./routes/order');
 const pot_routes = require('./routes/pot');
 const categoryPrice_routes = require('./routes/categoryPrice');
+const type_routes = require('./routes/type');
+const collection_routes = require('./routes/collection');
 //-----------------------------------------------HEBERGEMENT-----------------------------------------------------------------------------
 // if (typeof PhusionPassenger !== "undefined") {
 //   PhusionPassenger.configure({ autoInstall: false });
@@ -91,6 +93,8 @@ app.use('/api/price', price_routes);
 app.use('/api/order', order_routes);
 app.use('/api/pot', pot_routes);
 app.use('/api/categoryprice', categoryPrice_routes);
+app.use('/api/plantetype', type_routes);
+app.use('/api/plantecollection', collection_routes);
 
 //*ROUTE POUR LE QUIZ
 app.use('/quiz', quiz_routes);

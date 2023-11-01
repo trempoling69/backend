@@ -1,13 +1,17 @@
 const { Op } = require('sequelize');
 const { Plante, User } = require('../utils/importbdd');
+const { getOneType } = require('../services/type');
 
 const counteverything = async () => {
   var countAll = {};
+  const typeVivace = await getOneType('Vivace');
+  const typeAnnuelle = await getOneType('Annuelle');
+  const typeArbuste = await await getOneType('Arbuste');
   await Plante()
     .count({
       where: {
-        type: {
-          [Op.like]: 'Vivace',
+        type_id: {
+          [Op.like]: typeVivace.id,
         },
       },
     })
@@ -17,8 +21,8 @@ const counteverything = async () => {
   await Plante()
     .count({
       where: {
-        type: {
-          [Op.like]: 'Annuelle',
+        type_id: {
+          [Op.like]: typeAnnuelle.id,
         },
       },
     })
@@ -28,8 +32,8 @@ const counteverything = async () => {
   await Plante()
     .count({
       where: {
-        type: {
-          [Op.like]: 'Arbuste',
+        type_id: {
+          [Op.like]: typeArbuste.id,
         },
       },
     })
@@ -44,7 +48,7 @@ const counteverything = async () => {
   await Plante()
     .count({
       where: {
-        dispo: {
+        availability: {
           [Op.like]: true,
         },
       },
@@ -55,7 +59,7 @@ const counteverything = async () => {
   await Plante()
     .count({
       where: {
-        dispo: {
+        availability: {
           [Op.like]: false,
         },
       },

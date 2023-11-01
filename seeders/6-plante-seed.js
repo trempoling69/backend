@@ -7,15 +7,15 @@ const { createHashPlante } = require('../utils/hashimportbdd');
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    const typeVivace = Type().findOne({ where: { name: { [Op.eq]: 'Vivace' } } });
-    const typeAnnuelle = Type().findOne({ where: { name: { [Op.eq]: 'Annuelle' } } });
-    const typeArbuste = Type().findOne({ where: { name: { [Op.eq]: 'Arbuste' } } });
-    const collection1 = Collection().findOne({ where: { name: { [Op.eq]: 'Collection1' } } });
-    const collection2 = Collection().findOne({ where: { name: { [Op.eq]: 'Collection2' } } });
-    const price1 = Price().findOne({ where: { name: { [Op.eq]: 'Price_1' } } });
-    const price2 = Price().findOne({ where: { name: { [Op.eq]: 'Price_2' } } });
-    const pot1 = Pot().findOne({ where: { color: { [Op.eq]: 'taupe' } } });
-    const pot2 = Pot().findOne({ where: { color: { [Op.eq]: 'vert' } } });
+    const typeVivace = await Type().findOne({ where: { name: { [Op.eq]: 'Vivace' } } });
+    const typeAnnuelle = await Type().findOne({ where: { name: { [Op.eq]: 'Annuelle' } } });
+    const typeArbuste = await Type().findOne({ where: { name: { [Op.eq]: 'Arbuste' } } });
+    const collection1 = await Collection().findOne({ where: { name: { [Op.eq]: 'Collection1' } } });
+    const collection2 = await Collection().findOne({ where: { name: { [Op.eq]: 'Collection2' } } });
+    const price1 = await Price().findOne({ where: { name: { [Op.eq]: 'Price_1' } } });
+    const price2 = await Price().findOne({ where: { name: { [Op.eq]: 'Price_2' } } });
+    const pot1 = await Pot().findOne({ where: { color: { [Op.eq]: 'taupe' } } });
+    const pot2 = await Pot().findOne({ where: { color: { [Op.eq]: 'vert' } } });
     const dataPlante1 = {
       name: 'Plante_1',
       description: 'description de la plante 1',

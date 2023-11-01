@@ -10,25 +10,21 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Plante.belongsTo(models.Price, {
         foreignKey: 'price_id',
-        as: 'fk_price',
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       });
       Plante.belongsTo(models.Pot, {
         foreignKey: 'pot_id',
-        as: 'fk_pot',
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       });
       Plante.belongsTo(models.Type, {
         foreignKey: 'type_id',
-        as: 'fk_type',
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       });
       Plante.belongsTo(models.Collection, {
         foreignKey: 'collection_id',
-        as: 'fk_collection',
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       });
@@ -78,7 +74,7 @@ module.exports = (sequelize, DataTypes) => {
       exposition: {
         type: DataTypes.STRING,
         allowNull: true,
-        validate: { isIn: [['Soleil', 'Ombre', 'Mi-ombre', 'Polyvalent']] },
+        validate: { isIn: [['Soleil', 'Ombre', 'Mi-Ombre', 'Polyvalent']] },
       },
       hauteur: DataTypes.STRING,
       mois_floraison: DataTypes.STRING,

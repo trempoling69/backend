@@ -80,3 +80,17 @@ dev en Node.js avec une bdd en MySQL
 ### update 29/07
 
 - changement dans l'import pour que les champs vide soit null et non plus le string 'null'
+
+### update 01/11
+
+- reprise au propre des models de la bdd
+- optimisation de la création des tables
+- création de seeders pour la première utilisation
+- changement dans la gestion des clés étrtangères
+- créations du dossiers service qui regroupe les actions de base (create, get, update delete) sur la bdd
+- mise en place d'un template de réponse pour unifier les réponses
+- passage des fonctions en async await pour mieux gérer les requêtes
+- menages au maximum sur les fonctions
+- suppression de code legacy sur la db
+- ajout de JOI pour traiter les data entrante 
+- meilleur gestion des prix lors de création et modification de la plante

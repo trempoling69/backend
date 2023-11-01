@@ -1,6 +1,6 @@
 images
 *.xlsx
-/images
+images/
 /node_modules
 *.env
 .env

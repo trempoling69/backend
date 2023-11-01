@@ -1,4 +1,4 @@
-const { Plante, configBdd, Price, Pot } = require('../utils/importbdd');
+const { Plante, configBdd, Price, Pot, Type, CategoryPrice, Collection } = require('../utils/importbdd');
 const multer = require('multer');
 const checkuserInputAdd = require('../CheckInput/CheckUserInputAdd');
 const { checkInputToggleDispo } = require('../CheckInput/checkInputToggleDispo');
@@ -8,17 +8,21 @@ const fs = require('fs');
 const { createHashPrice } = require('../utils/hashimportbdd');
 const checkInputPriceForPlante = require('../CheckInput/checkInputPriceForPlante');
 const { sendSuccessResponse } = require('../middleware/responseTemplate');
-const { createPrice } = require('../services/price');
+const { createPrice, updateAmountPrice, findOnePrice, deleteOnePrice } = require('../services/price');
 const { insertOnePlante, updateOnePlant, findOnePlant } = require('../services/plante');
 const { Op } = require('sequelize');
 
-const allPlantes = (req, res, next) => {
+const allPlantes = async (_req, res, next) => {
   try {
-    Plante()
-      .findAll()
-      .then((plantes) => {
-        sendSuccessResponse(plantes, res, 200);
-      });
+    const plantes = await Plante().findAll({
+      include: [
+        { model: Price(), include: [{ model: CategoryPrice() }] },
+        { model: Pot() },
+        { model: Type() },
+        { model: Collection() },
+      ],
+    });
+    sendSuccessResponse(plantes, res, 200);
   } catch (err) {
     next(err);
   }
@@ -30,8 +34,10 @@ const planteById = async (req, res, next) => {
     const plante = await Plante().findOne({
       where: { id: { [Op.eq]: id } },
       include: [
-        { model: Price(), as: 'fk_price' },
-        { model: Pot(), as: 'fk_pot' },
+        { model: Price(), include: [{ model: CategoryPrice() }] },
+        { model: Pot() },
+        { model: Type() },
+        { model: Collection() },
       ],
     });
     sendSuccessResponse(plante, res, 200);
@@ -39,39 +45,55 @@ const planteById = async (req, res, next) => {
     next(err);
   }
 };
-
+const priceManage = async (price, name) => {
+  if (price.created) {
+    const valuePrice = {
+      name: `Prix_${name}`,
+      usualname: `Prix pour ${name}`,
+      amount: price.amount,
+      type: 'OTHER',
+    };
+    const priceCreate = await createPrice(valuePrice);
+    return { price: priceCreate, created: true };
+  } else {
+    if (price.type === 'BP') {
+      return { price: price, created: false };
+    }
+    if (price.type === 'OTHER') {
+      const priceUpdated = await updateAmountPrice(price.id, price.amount);
+      return { price: priceUpdated, created: false };
+    }
+  }
+};
 const insertPlante = async (req, res, next) => {
   try {
-    if (!isNaN(Number(req.body.prix)) && req.body.prix !== null) {
-      const valuePrice = {
-        name: `Prix_${req.body.nom}`,
-        usualname: `Prix pour ${req.body.nom}`,
-        amount: Number(req.body.prix),
-        type: 'OTHER',
-      };
-      const priceCreate = await createPrice(valuePrice);
-      req.body.prix = priceCreate.id;
-      req.body.priceCreate = true;
+    console.log(req.body);
+    if (req.body.Price !== null) {
+      const priceObj = await priceManage(req.body.Price, req.body.name);
+      req.body.price_id = priceObj.price.id;
+      req.body.priceCreate = priceObj.created;
+    } else {
+      req.body.price_id = null;
     }
     const valuePlante = {
-      nom: req.body.nom,
-      type: req.body.type,
+      name: req.body.name,
+      type_id: req.body.type_id,
       description: req.body.description,
-      catchPhrase: req.body.catchPhrase,
-      collection: req.body.collection,
+      catchphrase: req.body.catchphrase,
+      collection_id: req.body.collection_id,
       mois_floraison: req.body.mois_floraison,
       periode_floraison: req.body.periode_floraison,
       hauteur: req.body.hauteur,
-      couleur_dispo: req.body.couleur_dispo,
+      color_available: req.body.color_available,
       feuillage: req.body.feuillage,
       besoin_eau: req.body.besoin_eau,
       exposition: req.body.exposition,
       emplacement: req.body.emplacement,
-      pot: req.body.pot,
-      prix: req.body.prix,
+      pot_id: req.body.pot_id,
+      price_id: req.body.price_id,
       quantiteProd: req.body.quantiteProd,
-      dispo: req.body.dispo,
-      photo: req.file?.filename,
+      availability: req.body.availability,
+      picture: req.file?.filename,
     };
     await insertOnePlante(valuePlante);
     sendSuccessResponse('Plante ajouté avec succès', res, 201);
@@ -79,47 +101,60 @@ const insertPlante = async (req, res, next) => {
     next(err);
   }
 };
+
+const manageOldPrice = async (newPriceId, plantId) => {
+  const oldPlant = await findOnePlant(plantId);
+  if (oldPlant.price_id === null) {
+    return;
+  }
+  if (oldPlant.price_id === newPriceId) {
+    return;
+  }
+  const oldPrice = await findOnePrice(oldPlant.price_id);
+  if (oldPrice.type === 'OTHER') {
+    await deleteOnePrice(oldPrice.id);
+    return;
+  }
+  return;
+};
 const updatePlant = async (req, res, next) => {
   try {
-    if (!isNaN(Number(req.body.prix)) && req.body.prix !== null) {
-      const valuePrice = {
-        name: `Prix_${req.body.nom}`,
-        usualname: `Prix pour ${req.body.nom}`,
-        amount: Number(req.body.prix),
-        type: 'OTHER',
-      };
-      const priceCreate = await createPrice(valuePrice);
-      req.body.prix = priceCreate.id;
-      req.body.priceCreate = true;
+    if (req.body.Price !== null) {
+      const priceObj = await priceManage(req.body.Price, req.body.name);
+      req.body.price_id = priceObj.price.id;
+      req.body.priceCreate = priceObj.created;
+      await manageOldPrice(req.body.price_id, req.params.id);
+    } else {
+      req.body.price_id = null;
     }
     if (req.file) {
       const findPlant = await findOnePlant(req.params.id);
-      if (findPlant.photo !== null) {
-        const path = `./images/${findPlant.photo}`;
+      if (findPlant.picture !== null) {
+        const path = `./images/${findPlant.picture}`;
         if (fs.existsSync(path)) {
           fs.unlinkSync(path);
         }
       }
     }
     const valuePlant = {
-      nom: req.body.nom,
-      type: req.body.type,
+      name: req.body.name,
+      type_id: req.body.type_id,
       description: req.body.description,
-      catchPhrase: req.body.catchPhrase,
-      collection: req.body.collection,
+      catchphrase: req.body.catchphrase,
+      collection_id: req.body.collection_id,
       mois_floraison: req.body.mois_floraison,
       periode_floraison: req.body.periode_floraison,
       hauteur: req.body.hauteur,
-      couleur_dispo: req.body.couleur_dispo,
+      color_available: req.body.color_available,
       feuillage: req.body.feuillage,
       besoin_eau: req.body.besoin_eau,
       exposition: req.body.exposition,
       emplacement: req.body.emplacement,
-      pot: req.body.pot,
-      prix: req.body.prix,
+      pot_id: req.body.pot_id,
+      price_id: req.body.price_id,
       quantiteProd: req.body.quantiteProd,
-      dispo: req.body.dispo,
-      photo: req.file?.filename,
+      availability: req.body.availability,
+      picture: req.file?.filename,
     };
     await updateOnePlant(valuePlant, req.params.id);
     sendSuccessResponse('Plante modifié avec succès', res, 200);
@@ -200,10 +235,10 @@ const modifPlante = (req, res, next) => {
 
 const toggleDispo = async (req, res, next) => {
   try {
-    const { id, dispo } = req.body;
+    const { id, availability } = req.body;
     await Plante().update(
       {
-        dispo: dispo,
+        availability: availability,
       },
       {
         where: { id: { [Op.eq]: id } },

@@ -10,12 +10,10 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Price.hasMany(models.Plante, {
         foreignKey: 'price_id',
-        as: 'fk_plante',
       });
 
       Price.belongsTo(models.CategoryPrice, {
         foreignKey: 'category_id',
-        as: 'fk_category',
       });
     }
   }

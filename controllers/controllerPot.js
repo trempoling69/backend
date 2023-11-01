@@ -11,15 +11,14 @@ const allPots = async (req, res, next) => {
         'brand',
         'color',
         'size',
-        [Sequelize.fn('COALESCE', Sequelize.fn('COUNT', Sequelize.col('fk_plante.id')), 0), 'useFor'],
-        [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('fk_plante.quantiteProd')), 0), 'useTotalBy'],
+        [Sequelize.fn('COALESCE', Sequelize.fn('COUNT', Sequelize.col('Plantes.id')), 0), 'useFor'],
+        [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('Plantes.quantiteProd')), 0), 'useTotalBy'],
       ],
       include: [
         {
           model: Plante(),
           attributes: [],
           required: false,
-          as: 'fk_plante',
         },
       ],
       group: ['Pot.id'],
