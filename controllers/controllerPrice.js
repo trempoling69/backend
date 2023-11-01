@@ -19,18 +19,17 @@ const getPriceWithFk = async (req, res, next) => {
         'amount',
         'usualname',
         'type',
-        [Sequelize.col('fk_category.name'), 'categoryName'],
-        [Sequelize.col('fk_category.id'), 'categoryId'],
-        [Sequelize.fn('COALESCE', Sequelize.fn('COUNT', Sequelize.col('fk_plante.id')), 0), 'useFor'],
+        [Sequelize.col('CategoryPrice.name'), 'categoryName'],
+        [Sequelize.col('CategoryPrice.id'), 'categoryId'],
+        [Sequelize.fn('COALESCE', Sequelize.fn('COUNT', Sequelize.col('Plantes.id')), 0), 'useFor'],
       ],
       include: [
         {
           model: Plante(),
           attributes: [],
           required: false,
-          as: 'fk_plante',
         },
-        { model: CategoryPrice(), attributes: [], as: 'fk_category' },
+        { model: CategoryPrice(), attributes: [] },
       ],
       group: ['Price.id'],
     });
