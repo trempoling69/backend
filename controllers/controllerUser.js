@@ -5,9 +5,11 @@ const { Op } = require('sequelize');
 
 const getUser = (req, res, next) => {
   try {
-    console.log(req.user.role);
-    sendSuccessResponse({ username: req.user.username, role: req.user.role }, res, 200);
-    console.log('auth?', req.isAuthenticated());
+    sendSuccessResponse(
+      { username: req.user.username, role: req.user.role, isAuthenticated: req.isAuthenticated() },
+      res,
+      200
+    );
   } catch (err) {
     next(err);
   }

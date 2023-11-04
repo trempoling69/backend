@@ -78,7 +78,7 @@ const { sendErrorResponse } = require('./middleware/responseTemplate');
 const basicCheckUserInput = require('./middleware/basicCheckUserInput');
 const authSchema = require('./CheckInput/schema/auth');
 const createCategory = require('./controllers/controllerCategoryPrice');
-app.post('/login', controllerAuth.login);
+app.post('/login', basicCheckUserInput(authSchema.body.login, 'body'), controllerAuth.login);
 app.post('/register', verifyJWT, basicCheckUserInput(authSchema.body.register, 'body'), controllerAuth.register);
 app.get('/islogged', verifyJWT, controllerAuth.isLogged);
 
@@ -105,7 +105,7 @@ app.use('/cart', cart_routes);
 app.get('/', (req, res) => {
   res.send("Bienvenue sur l'api privé de RougyHorticulure");
 });
-app.use((req, res, next) => {
+app.use((req, res) => {
   sendErrorResponse('Ressource introuvable', res, 404);
 });
 app.use((err, req, res, next) => {

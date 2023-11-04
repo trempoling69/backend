@@ -63,6 +63,36 @@ const authSchema = {
           return errors;
         }),
     }),
+    login: Joi.object({
+      username: Joi.string()
+        .required()
+        .error((errors) => {
+          errors.forEach((err) => {
+            switch (err.code) {
+              case 'string.empty':
+                err.message = 'Le username ne peut pas être vide';
+                break;
+              default:
+                break;
+            }
+          });
+          return errors;
+        }),
+      password: Joi.string()
+        .required()
+        .error((errors) => {
+          errors.forEach((err) => {
+            switch (err.code) {
+              case 'string.empty':
+                err.message = 'Le mot de passe ne peut pas être vide';
+                break;
+              default:
+                break;
+            }
+          });
+          return errors;
+        }),
+    }),
   },
 };
 

@@ -9,7 +9,7 @@ require('dotenv').config();
 
 exports.isLogged = (req, res) => {
   console.log(req.isAuthenticated());
-  res.send(true);
+  sendSuccessResponse(req.isAuthenticated(), res, 200);
 };
 
 exports.register = async (req, res, next) => {
@@ -31,52 +31,45 @@ exports.register = async (req, res, next) => {
   }
 };
 
-exports.login = (req, res) => {
-  checkLoginInput(req, res, (data) => {
-    req.body.username = data.get('username');
-    req.body.password = data.get('password');
-    if (!data.get('username')) {
-      res.json({ success: false, message: 'Username was not given' });
-    } else if (!data.get('password')) {
-      res.json({ success: false, message: 'Password was not given' });
-    } else {
-      passport.authenticate('local', { session: false }, function (err, user, info) {
-        if (err) {
-          res.json({ success: false, message: err });
-        } else {
-          if (!user) {
-            res.json({
-              success: false,
-              message: 'Username ou password incorrect',
-            });
-          } else {
-            req.login(user, { session: false }, (err) => {
-              if (err) {
-                res.send(err);
-              }
-              const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-              User()
-                .update(
-                  {
-                    lastConn: Date.now(),
-                  },
-                  {
-                    where: {
-                      id: user.id,
-                    },
-                  }
-                )
-                .then(() => {
-                  res.json({
-                    success: true,
-                    message: 'Authentication successful',
-                    token,
-                  });
-                });
-            });
-          }
-        }
-      })(req, res);
+exports.login = (req, res, next) => {
+  passport.authenticate('local', { session: false }, (err, user) => {
+    if (err) {
+      const error = new Error('OUPS ! Une erreur est survenue');
+      return next(error);
     }
-  });
+
+    if (!user) {
+      const error = new Error('Identifiant ou mot de passe incorrect');
+      return next(error);
+    }
+
+    req.login(user, { session: false }, (err) => {
+      if (err) {
+        console.log(err);
+        const error = new Error('OUPS ! Une erreur est survenue');
+        return next(error);
+      }
+
+      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+      User()
+        .update(
+          {
+            lastConn: Date.now(),
+          },
+          {
+            where: {
+              id: user.id,
+            },
+          }
+        )
+        .then(() => {
+          sendSuccessResponse({ token }, res, 200);
+        })
+        .catch((err) => {
+          console.log(err);
+          const error = new Error('Erreur lors de la mise à jour des informations utilisateur');
+          return next(error);
+        });
+    });
+  })(req, res);
 };
