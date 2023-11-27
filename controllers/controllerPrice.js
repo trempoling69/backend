@@ -19,8 +19,6 @@ const getPriceWithFk = async (req, res, next) => {
         'amount',
         'usualname',
         'type',
-        [Sequelize.col('CategoryPrice.name'), 'categoryName'],
-        [Sequelize.col('CategoryPrice.id'), 'categoryId'],
         [Sequelize.fn('COALESCE', Sequelize.fn('COUNT', Sequelize.col('Plantes.id')), 0), 'useFor'],
       ],
       include: [
@@ -29,7 +27,7 @@ const getPriceWithFk = async (req, res, next) => {
           attributes: [],
           required: false,
         },
-        { model: CategoryPrice(), attributes: [] },
+        { model: CategoryPrice(), attributes: ['name', 'id'] },
       ],
       group: ['Price.id'],
     });
@@ -41,10 +39,10 @@ const getPriceWithFk = async (req, res, next) => {
 
 const postCreatePrice = async (req, res, next) => {
   try {
-    let categoryId = req.body.categoryId;
+    let categoryId = req.body.CategoryPrice.id;
     if (categoryId === 'new') {
       const value = {
-        name: req.body.categoryName,
+        name: req.body.CategoryPrice.name,
       };
       const category = await createNewCategory(value);
       categoryId = category.id;
@@ -104,9 +102,9 @@ const modifyPrice = async (req, res, next) => {
 const deletePrice = async (req, res, next) => {
   try {
     const priceToDelete = await findOnePrice(req.params.id);
-    const findAllPrice = await findAllPriceWithOneCategory(priceToDelete.categoryId);
+    const findAllPrice = await findAllPriceWithOneCategory(priceToDelete.category_id);
     if (findAllPrice[0].get('useBy') === 1) {
-      await deleteOneCategory(priceToDelete.categoryId);
+      await deleteOneCategory(priceToDelete.category_id);
     }
     await deleteOnePrice(priceToDelete.id);
     sendSuccessResponse('succes', res, 200);

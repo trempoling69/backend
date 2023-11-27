@@ -43,13 +43,12 @@ const findAllPriceWithOneCategory = async (id) => {
   try {
     const allPrice = await CategoryPrice().findAll({
       where: { id: { [Op.eq]: id } },
-      attributes: [[Sequelize.fn('COUNT', Sequelize.col('fk_price.id')), 'useBy']],
+      attributes: [[Sequelize.fn('COUNT', Sequelize.col('Prices.id')), 'useBy']],
       include: [
         {
           model: Price(),
           attributes: [],
           required: false,
-          as: 'fk_price',
         },
       ],
     });

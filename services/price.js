@@ -40,7 +40,7 @@ const createPrice = async (value) => {
       usualname: checkValue.usualname,
       amount: checkValue.amount,
       type: checkValue.type,
-      categoryId: checkValue.categoryId,
+      category_id: checkValue.categoryId,
       hashPrice: hashPrice,
     });
     return priceCreate;

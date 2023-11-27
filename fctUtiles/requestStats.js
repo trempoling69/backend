@@ -1,12 +1,12 @@
 const { Op } = require('sequelize');
 const { Plante, User } = require('../utils/importbdd');
-const { getOneType } = require('../services/type');
+const { getOneTag } = require('../services/tag');
 
 const counteverything = async () => {
   var countAll = {};
-  const typeVivace = await getOneType('Vivace');
-  const typeAnnuelle = await getOneType('Annuelle');
-  const typeArbuste = await await getOneType('Arbuste');
+  const typeVivace = await getOneTag('Vivace', 'type');
+  const typeAnnuelle = await getOneTag('Annuelle', 'type');
+  const typeArbuste = await await getOneTag('Arbuste', 'type');
   await Plante()
     .count({
       where: {

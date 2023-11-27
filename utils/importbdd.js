@@ -1,19 +1,5 @@
 const models = require('../models/index');
 
-exports.Plante = () => {
-  return models.Plante;
-};
-
-exports.User = () => {
-  return models.User;
-};
-
-exports.Question = () => {
-  return models.Question;
-};
-exports.Reponse = () => {
-  return models.Reponse;
-};
 exports.configBdd = () => {
   let configDonneeBdd = {
     id: {
@@ -99,6 +85,24 @@ exports.configBdd = () => {
   };
   return configDonneeBdd;
 };
+exports.Plante = () => {
+  return models.Plante;
+};
+
+exports.User = () => {
+  return models.User;
+};
+
+exports.Question = () => {
+  return models.Question;
+};
+exports.Reponse = () => {
+  return models.Reponse;
+};
+
+exports.Tag = () => {
+  return models.Tag;
+};
 
 exports.Price = () => {
   return models.Price;
@@ -114,12 +118,4 @@ exports.Pot = () => {
 
 exports.CategoryPrice = () => {
   return models.CategoryPrice;
-};
-
-exports.Collection = () => {
-  return models.Collection;
-};
-
-exports.Type = () => {
-  return models.Type;
 };

@@ -1,4 +1,4 @@
-const { Plante, configBdd, Price, Pot, Type, CategoryPrice, Collection } = require('../utils/importbdd');
+const { Plante, configBdd, Price, Pot, CategoryPrice, Tag } = require('../utils/importbdd');
 const multer = require('multer');
 const checkuserInputAdd = require('../CheckInput/CheckUserInputAdd');
 const { checkInputToggleDispo } = require('../CheckInput/checkInputToggleDispo');
@@ -18,8 +18,12 @@ const allPlantes = async (_req, res, next) => {
       include: [
         { model: Price(), include: [{ model: CategoryPrice() }] },
         { model: Pot() },
-        { model: Type() },
-        { model: Collection() },
+        { model: Tag(), as: 'type' },
+        { model: Tag(), as: 'collection' },
+        { model: Tag(), as: 'feuillage' },
+        { model: Tag(), as: 'exposition' },
+        { model: Tag(), as: 'besoin_eau' },
+        { model: Tag(), as: 'periode_floraison' },
       ],
     });
     sendSuccessResponse(plantes, res, 200);
@@ -36,8 +40,12 @@ const planteById = async (req, res, next) => {
       include: [
         { model: Price(), include: [{ model: CategoryPrice() }] },
         { model: Pot() },
-        { model: Type() },
-        { model: Collection() },
+        { model: Tag(), as: 'type' },
+        { model: Tag(), as: 'collection' },
+        { model: Tag(), as: 'feuillage' },
+        { model: Tag(), as: 'exposition' },
+        { model: Tag(), as: 'besoin_eau' },
+        { model: Tag(), as: 'periode_floraison' },
       ],
     });
     sendSuccessResponse(plante, res, 200);

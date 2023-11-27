@@ -25,8 +25,13 @@ const priceSchema = {
       name: Joi.string().required(),
       usualname: Joi.string().required(),
       amount: Joi.number().required(),
-      categoryId: Joi.alternatives(Joi.string(), Joi.allow(null)),
-      categoryName: Joi.alternatives(Joi.string().optional(), Joi.allow(null)),
+      CategoryPrice: Joi.alternatives(
+        Joi.allow(null),
+        Joi.object({
+          id: Joi.alternatives(Joi.string(), Joi.allow(null)),
+          name: Joi.alternatives(Joi.string().optional(), Joi.allow(null)),
+        })
+      ),
     }),
   },
 };

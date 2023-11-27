@@ -9,7 +9,7 @@ const exportxlsx = (res, json, sheets, prices, pots) => {
   let plantes = { Vivaces: [], Annuelles: [], Arbustes: [], Prix: [], Pots: [] };
   let plante = JSON.parse(JSON.stringify(plantes));
   for (let index = 0; index < Object.keys(jsonPlantes).length; index++) {
-    if (jsonPlantes[index]['type'] === 'Vivace') {
+    if (jsonPlantes[index]['type_id'] === '3fe2e830-9617-4e47-b33f-c0f33ebfd866') {
       plante.Vivaces.push(jsonPlantes[index]);
     }
     if (jsonPlantes[index]['type'] === 'Annuelle') {

@@ -29,7 +29,7 @@ exports.createHashPlante = (data) => {
 };
 
 exports.createHashPrice = (data) => {
-  let stringPrice = `${data.name + data.amount + data.usualname + data.type + data.category_id}`;
+  let stringPrice = `${data.name + data.amount + data.usualname + data.type + data.categoryId}`;
   const hash = crypto.createHash('sha256');
   hash.update(stringPrice);
   const result = hash.digest('hex');

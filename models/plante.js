@@ -18,15 +18,41 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       });
-      Plante.belongsTo(models.Type, {
+      Plante.belongsTo(models.Tag, {
         foreignKey: 'type_id',
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
+        as: 'type',
       });
-      Plante.belongsTo(models.Collection, {
+      Plante.belongsTo(models.Tag, {
         foreignKey: 'collection_id',
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
+        as: 'collection',
+      });
+      Plante.belongsTo(models.Tag, {
+        foreignKey: 'feuillage_id',
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+        as: 'feuillage',
+      });
+      Plante.belongsTo(models.Tag, {
+        foreignKey: 'exposition_id',
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+        as: 'exposition',
+      });
+      Plante.belongsTo(models.Tag, {
+        foreignKey: 'besoin_eau_id',
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+        as: 'besoin_eau',
+      });
+      Plante.belongsTo(models.Tag, {
+        foreignKey: 'periode_floraison_id',
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+        as: 'periode_floraison',
       });
     }
   }
@@ -56,30 +82,62 @@ module.exports = (sequelize, DataTypes) => {
       type_id: {
         type: DataTypes.UUID,
         references: {
-          model: 'Types',
+          model: 'Tags',
           key: 'id',
         },
         validate: {
           notEmpty: true,
         },
       },
-      feuillage: DataTypes.STRING,
+      feuillage_id: {
+        type: DataTypes.UUID,
+        references: {
+          model: 'Tags',
+          key: 'id',
+        },
+        validate: {
+          notEmpty: false,
+        },
+      },
       collection_id: {
         type: DataTypes.UUID,
         references: {
-          model: 'Collections',
+          model: 'Tags',
           key: 'id',
         },
       },
-      exposition: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        validate: { isIn: [['Soleil', 'Ombre', 'Mi-Ombre', 'Polyvalent']] },
+      exposition_id: {
+        type: DataTypes.UUID,
+        references: {
+          model: 'Tags',
+          key: 'id',
+        },
+        validate: {
+          notEmpty: false,
+        },
       },
       hauteur: DataTypes.STRING,
       mois_floraison: DataTypes.STRING,
-      periode_floraison: DataTypes.STRING,
-      besoin_eau: DataTypes.STRING,
+      periode_floraison_id: {
+        type: DataTypes.UUID,
+        references: {
+          model: 'Tags',
+          key: 'id',
+        },
+        validate: {
+          notEmpty: false,
+        },
+      },
+      besoin_eau_id: {
+        type: DataTypes.UUID,
+        references: {
+          model: 'Tags',
+          key: 'id',
+        },
+        validate: {
+          notEmpty: false,
+        },
+      },
       picture: DataTypes.STRING,
       availability: {
         type: DataTypes.BOOLEAN,

@@ -3,20 +3,7 @@ const Joi = require('joi');
 const potSchema = {
   params: {
     object: Joi.object({
-      id: Joi.number()
-        .required()
-        .error((errors) => {
-          errors.forEach((err) => {
-            switch (err.code) {
-              case 'number.base':
-                err.message = "L'id doit être un nombre";
-                break;
-              default:
-                break;
-            }
-          });
-          return errors;
-        }),
+      id: Joi.string().required(),
     }),
   },
   body: {

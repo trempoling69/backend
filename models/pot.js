@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         primaryKey: true,
       },
-      size: DataTypes.INTEGER,
+      size: DataTypes.FLOAT,
       color: DataTypes.STRING,
       brand: DataTypes.STRING,
     },
