@@ -14,6 +14,8 @@ module.exports = (sequelize, DataTypes) => {
 
       Price.belongsTo(models.CategoryPrice, {
         foreignKey: 'category_id',
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
       });
     }
   }

@@ -37,11 +37,11 @@ const collection_routes = require('./routes/collection');
 //   next();
 // });
 //------------------------------------------GESTION BASE DE DONNEE------------------------------------------------------
-var models = require('./models/index');
-const syncTable = async () => {
-  await models.sequelize.sync();
-};
-syncTable();
+// var models = require('./models/index');
+// const syncTable = async () => {
+//   await models.sequelize.sync();
+// };
+// syncTable();
 //------------------------------------------------------FIN GESTION BASE DE DONNEE-------------------------------------------------
 //*CONFIG SERVER
 // const limiter = rateLimit({
