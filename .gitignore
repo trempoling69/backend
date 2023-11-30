@@ -1,9 +1,9 @@
-images
 *.xlsx
-images/
+images/*
+!images/.gitkeep 
 /node_modules
 *.env
 .env
-logs.txt
 *.txt
-logs
+logs/*
+!logs/.gitkeep 
