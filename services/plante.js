@@ -97,4 +97,15 @@ const updateOnePlant = async (value, id) => {
     throw new Error('Erreur lors de la modification de la plante');
   }
 };
-module.exports = { insertOnePlante, updateOnePlant, findOnePlant };
+
+const deleteOnePlant = async (id) => {
+  try {
+    const plantToDelete = await findOnePlant(id);
+    Plante().destroy({ where: { id: { [Op.eq]: plantToDelete.id } } });
+    return plantToDelete;
+  } catch (error) {
+    console.log(error);
+    throw new Error('Erreur lors de la suppression de la plante');
+  }
+};
+module.exports = { insertOnePlante, updateOnePlant, findOnePlant, deleteOnePlant };

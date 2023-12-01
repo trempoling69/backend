@@ -1,9 +1,8 @@
 const { Plante, Price, Pot, CategoryPrice, Tag } = require('../utils/importbdd');
-const { checkParamsId } = require('../CheckInput/checkParamsId');
 const fs = require('fs');
 const { sendSuccessResponse } = require('../middleware/responseTemplate');
 const { createPrice, updateAmountPrice, findOnePrice, deleteOnePrice } = require('../services/price');
-const { insertOnePlante, updateOnePlant, findOnePlant } = require('../services/plante');
+const { insertOnePlante, updateOnePlant, findOnePlant, deleteOnePlant } = require('../services/plante');
 const { Op } = require('sequelize');
 
 const allPlantes = async (_req, res, next) => {
@@ -124,14 +123,14 @@ const manageOldPrice = async (newPriceId, plantId) => {
 
 const updatePlant = async (req, res, next) => {
   try {
-    if (req.body.Price !== null) {
+    if (req.body.Price.id !== '') {
       const priceObj = await priceManage(req.body.Price, req.body.name);
       req.body.price_id = priceObj.price.id;
       req.body.priceCreate = priceObj.created;
-      await manageOldPrice(req.body.price_id, req.params.id);
     } else {
       req.body.price_id = null;
     }
+    await manageOldPrice(req.body.price_id, req.params.id);
     if (req.file) {
       const findPlant = await findOnePlant(req.params.id);
       if (findPlant.picture !== null) {
@@ -185,31 +184,20 @@ const toggleDispo = async (req, res, next) => {
   }
 };
 
-const suppPlante = (req, res) => {
-  checkParamsId(req, res, (data) => {
-    Plante()
-      .findOne({ where: { id: data.get('id') } })
-      .then((plante) => {
-        if (plante == null) {
-          res.status(400).send('Aucune plante correspond à celle que vous supprimez');
-        } else {
-          Plante()
-            .destroy({ where: { id: plante.id } })
-            .then((item) => {
-              fs.unlink(`./images/${plante.photo}`, (err) => {
-                if (err) {
-                  res.write('une erreur est survenu');
-                  res.status(400).end();
-                  return;
-                }
-                res.json({ status: item });
-              });
-            })
-            .catch((err) => res.status(400).send(err));
-        }
-      })
-      .catch((err) => res.status(400).send(err));
-  });
+const deletePlante = async (req, res, next) => {
+  try {
+    const idPlante = req.params.id;
+    const planteDelete = await deleteOnePlant(idPlante);
+    if (planteDelete.picture !== null) {
+      const path = `./images/${planteDelete.picture}`;
+      if (fs.existsSync(path)) {
+        fs.unlinkSync(path);
+      }
+    }
+    sendSuccessResponse('Plante supprimé', res, 200);
+  } catch (err) {
+    next(err);
+  }
 };
 
 module.exports = {
@@ -217,6 +205,6 @@ module.exports = {
   planteById,
   insertPlante,
   toggleDispo,
-  suppPlante,
+  deletePlante,
   updatePlant,
 };

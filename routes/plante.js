@@ -5,7 +5,7 @@ const {
   planteById,
   insertPlante,
   toggleDispo,
-  suppPlante,
+  deletePlante,
   updatePlant,
 } = require('../controllers/controllerPlante');
 const basicCheckUserInput = require('../middleware/basicCheckUserInput');
@@ -13,7 +13,7 @@ const planteSchema = require('../CheckInput/schema/plante');
 const { managePhoto, deleteUploadedPhotoOnError, changeForNullInput } = require('../middleware/plante');
 
 router.post(
-  '/insertplante',
+  '/',
   managePhoto,
   changeForNullInput,
   basicCheckUserInput(planteSchema.body.request, 'body'),
@@ -21,7 +21,7 @@ router.post(
   deleteUploadedPhotoOnError
 );
 router.put(
-  '/updateplant/:id',
+  '/:id',
   managePhoto,
   changeForNullInput,
   basicCheckUserInput(planteSchema.params.object, 'params'),
@@ -30,8 +30,8 @@ router.put(
   deleteUploadedPhotoOnError
 );
 router.post('/toggledispo', basicCheckUserInput(planteSchema.body.toggleDispo, 'body'), toggleDispo);
-router.delete('/deleteplant/:id', basicCheckUserInput(planteSchema.params.object, 'params'), suppPlante);
-router.get('/byid/:id', basicCheckUserInput(planteSchema.params.object, 'params'), planteById);
-router.get('/allPlante', allPlantes);
+router.delete('/:id', basicCheckUserInput(planteSchema.params.object, 'params'), deletePlante);
+router.get('/:id', basicCheckUserInput(planteSchema.params.object, 'params'), planteById);
+router.get('/', allPlantes);
 
 module.exports = router;
