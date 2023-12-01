@@ -14,4 +14,14 @@ const getOneTag = async (name, tag_type) => {
   }
 };
 
-module.exports = { getOneTag };
+const findTagByType = async (tagType) => {
+  try {
+    const tagFind = await Tag().findAll({ where: { tag_type: { [Op.eq]: tagType } } });
+    return tagFind;
+  } catch (err) {
+    console.log(err);
+    throw new Error(err);
+  }
+};
+
+module.exports = { getOneTag, findTagByType };

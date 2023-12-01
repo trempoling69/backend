@@ -30,13 +30,13 @@ const insertOnePlante = async (value) => {
       description: checkValue.description,
       color_available: checkValue.color_available,
       type_id: checkValue.type_id,
-      feuillage: checkValue.feuillage,
+      feuillage_id: checkValue.feuillage_id,
       collection_id: checkValue.collection_id,
-      exposition: checkValue.exposition,
+      exposition_id: checkValue.exposition_id,
       hauteur: checkValue.hauteur,
       mois_floraison: checkValue.mois_floraison,
-      periode_floraison: checkValue.periode_floraison,
-      besoin_eau: checkValue.besoin_eau,
+      periode_floraison_id: checkValue.periode_floraison_id,
+      besoin_eau_id: checkValue.besoin_eau_id,
       picture: checkValue.picture,
       availability: checkValue.availability,
       price_id: checkValue.price_id,
@@ -73,13 +73,13 @@ const updateOnePlant = async (value, id) => {
         description: checkValue.description,
         color_available: checkValue.color_available,
         type_id: checkValue.type_id,
-        feuillage: checkValue.feuillage,
+        feuillage_id: checkValue.feuillage,
         collection_id: checkValue.collection_id,
-        exposition: checkValue.exposition,
+        exposition_id: checkValue.exposition_id,
         hauteur: checkValue.hauteur,
         mois_floraison: checkValue.mois_floraison,
-        periode_floraison: checkValue.periode_floraison,
-        besoin_eau: checkValue.besoin_eau,
+        periode_floraison_id: checkValue.periode_floraison_id,
+        besoin_eau_id: checkValue.besoin_eau_id,
         picture: checkValue.picture,
         availability: checkValue.availability,
         price_id: checkValue.price_id,
@@ -93,6 +93,7 @@ const updateOnePlant = async (value, id) => {
     );
     return plant;
   } catch (err) {
+    console.log(err);
     throw new Error('Erreur lors de la modification de la plante');
   }
 };

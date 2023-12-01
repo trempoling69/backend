@@ -23,26 +23,8 @@ const cart_routes = require('./routes/cart');
 const order_routes = require('./routes/order');
 const pot_routes = require('./routes/pot');
 const categoryPrice_routes = require('./routes/categoryPrice');
-const type_routes = require('./routes/type');
-const collection_routes = require('./routes/collection');
-//-----------------------------------------------HEBERGEMENT-----------------------------------------------------------------------------
-// if (typeof PhusionPassenger !== "undefined") {
-//   PhusionPassenger.configure({ autoInstall: false });
-// }
-// app.use(function (request, response, next) {
-//   if (!request.secure) {
-//     return response.redirect("https://" + request.headers.host + request.url);
-//   }
+const tag_routes = require('./routes/tag');
 
-//   next();
-// });
-//------------------------------------------GESTION BASE DE DONNEE------------------------------------------------------
-// var models = require('./models/index');
-// const syncTable = async () => {
-//   await models.sequelize.sync();
-// };
-// syncTable();
-//------------------------------------------------------FIN GESTION BASE DE DONNEE-------------------------------------------------
 //*CONFIG SERVER
 // const limiter = rateLimit({
 //   windowMs: 60 * 60 * 1000, // 1 heure
@@ -93,8 +75,7 @@ app.use('/api/price', price_routes);
 app.use('/api/order', order_routes);
 app.use('/api/pot', pot_routes);
 app.use('/api/categoryprice', categoryPrice_routes);
-app.use('/api/plantetype', type_routes);
-app.use('/api/plantecollection', collection_routes);
+app.use('/api/tag', tag_routes);
 
 //*ROUTE POUR LE QUIZ
 app.use('/quiz', quiz_routes);
@@ -113,15 +94,6 @@ app.use((err, req, res, next) => {
   sendErrorResponse(err.message, res, 500);
 });
 //----------------------------------------------------END API ROUTES--------------------------------------------------------
-
-//demarrage server
-// if (typeof PhusionPassenger !== "undefined") {
-//   app.listen("passenger");
-// } else {
-//   app.listen(process.env.DEV_PORT, () => {
-//     console.log(`running on port ${process.env.DEV_PORT}`);
-//   });
-// }
 
 app.listen(process.env.DEV_PORT, () => {
   console.log(`running on port ${process.env.DEV_PORT}`);
