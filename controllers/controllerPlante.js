@@ -1,12 +1,6 @@
-const { Plante, configBdd, Price, Pot, CategoryPrice, Tag } = require('../utils/importbdd');
-const multer = require('multer');
-const checkuserInputAdd = require('../CheckInput/CheckUserInputAdd');
-const { checkInputToggleDispo } = require('../CheckInput/checkInputToggleDispo');
+const { Plante, Price, Pot, CategoryPrice, Tag } = require('../utils/importbdd');
 const { checkParamsId } = require('../CheckInput/checkParamsId');
-const upload = require('../middleware/multer');
 const fs = require('fs');
-const { createHashPrice } = require('../utils/hashimportbdd');
-const checkInputPriceForPlante = require('../CheckInput/checkInputPriceForPlante');
 const { sendSuccessResponse } = require('../middleware/responseTemplate');
 const { createPrice, updateAmountPrice, findOnePrice, deleteOnePrice } = require('../services/price');
 const { insertOnePlante, updateOnePlant, findOnePlant } = require('../services/plante');
@@ -53,6 +47,7 @@ const planteById = async (req, res, next) => {
     next(err);
   }
 };
+
 const priceManage = async (price, name) => {
   if (price.created) {
     const valuePrice = {
@@ -73,6 +68,7 @@ const priceManage = async (price, name) => {
     }
   }
 };
+
 const insertPlante = async (req, res, next) => {
   try {
     console.log(req.body);
@@ -125,6 +121,7 @@ const manageOldPrice = async (newPriceId, plantId) => {
   }
   return;
 };
+
 const updatePlant = async (req, res, next) => {
   try {
     if (req.body.Price !== null) {
@@ -171,76 +168,6 @@ const updatePlant = async (req, res, next) => {
   }
 };
 
-const modifPlante = (req, res, next) => {
-  upload(req, res, (err) => {
-    if (err instanceof multer.MulterError) {
-      console.log(err);
-      res.status(400).send(err.code);
-    } else if (err) {
-      console.log(err.message);
-      res.status(400).send(err.message);
-    } else {
-      let photo = '';
-      let modifyPhoto = false;
-      if (req.file === undefined) {
-        if (req.body.photo === '') {
-          photo = null;
-        } else {
-          photo = req.body.photo.replace(/[<>]/g, '');
-        }
-      } else if (req.body.photo === '') {
-        photo = req.file.filename;
-        modifyPhoto = true;
-      } else {
-        const path = `./images/${req.body.photo.replace(/[<>]/g, '')}`;
-        if (fs.existsSync(path)) {
-          try {
-            fs.unlinkSync(path);
-          } catch (err) {
-            res.status(400).send(err);
-          }
-        }
-        photo = req.file.filename;
-        modifyPhoto = true;
-      }
-      if (req.body.prix === 'new') {
-        if (
-          checkInputPriceForPlante(req.body, res, (checkedValue) => {
-            createHashPrice(checkedValue, (hashPrice) => {
-              Price()
-                .create({
-                  name: `Prix_${checkedValue.get('nom')}`,
-                  usualname: `Prix pour ${checkedValue.get('nom')}`,
-                  amount: checkedValue.get('newPrice'),
-                  type: 'OTHER',
-                  hashPrice: hashPrice,
-                })
-                .then((prix) => {
-                  req.body.prix = prix.id;
-                  modificationPlante(req, res, photo);
-                });
-            });
-          })
-        ) {
-          if (modifyPhoto) {
-            const path = `./images/${req.file.filename}`;
-            if (fs.existsSync(path)) {
-              try {
-                fs.unlinkSync(path);
-              } catch (err) {
-                res.status(400).send(err);
-              }
-            }
-          }
-          res.end();
-        }
-      } else {
-        modificationPlante(req, res, photo);
-      }
-    }
-  });
-};
-
 const toggleDispo = async (req, res, next) => {
   try {
     const { id, availability } = req.body;
@@ -285,49 +212,10 @@ const suppPlante = (req, res) => {
   });
 };
 
-const modificationPlante = (req, res, photo) => {
-  if (
-    checkuserInputAdd(req.body, null, configBdd(), res, (data) => {
-      Plante()
-        .update(
-          {
-            nom: data.get('nom'),
-            description: data.get('description'),
-            couleur_dispo: data.get('couleur_dispo'),
-            type: data.get('type'),
-            feuillage: data.get('feuillage'),
-            collection: data.get('collection'),
-            exposition: data.get('exposition'),
-            hauteur: data.get('hauteur'),
-            mois_floraison: data.get('mois_floraison'),
-            periode_floraison: data.get('periode_floraison'),
-            besoin_eau: data.get('besoin_eau'),
-            photo: photo,
-            dispo: data.get('dispo'),
-            prix: data.get('prix'),
-            emplacement: data.get('emplacement'),
-            quantiteProd: data.get('quantiteProd'),
-            catchPhrase: data.get('catchPhrase'),
-          },
-          {
-            where: { id: req.body.id },
-          }
-        )
-        .then((result) => {
-          res.status(200).send('Plante modifié');
-        });
-    })
-  ) {
-    console.log('ici');
-    res.end();
-  }
-};
-
 module.exports = {
   allPlantes,
   planteById,
   insertPlante,
-  modifPlante,
   toggleDispo,
   suppPlante,
   updatePlant,

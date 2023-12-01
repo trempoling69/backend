@@ -29,7 +29,7 @@ const tag_routes = require('./routes/tag');
 // const limiter = rateLimit({
 //   windowMs: 60 * 60 * 1000, // 1 heure
 //   max: 3000, // limite à ce nombre de requêtes par heure
-//   message: 'Trop de requêtes de cette adresse IP, veuillez réessayer plus tard',
+//   message: 'Trop de requêtes, veuillez réessayer plus tard',
 // });
 app.use(helmet());
 app.disable('x-powered-by');
