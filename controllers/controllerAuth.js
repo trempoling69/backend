@@ -1,5 +1,4 @@
 const { User } = require('../utils/importbdd');
-const checkLoginInput = require('../CheckInput/CheckUserInputAuth');
 var bcrypt = require('bcryptjs');
 var passport = require('passport');
 require('../middleware/passportConfig')(passport);

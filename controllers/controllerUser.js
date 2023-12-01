@@ -1,5 +1,4 @@
 const { User } = require('../utils/importbdd');
-const { checkParamsId } = require('../CheckInput/checkParamsId');
 const { sendSuccessResponse } = require('../middleware/responseTemplate');
 const { Op } = require('sequelize');
 
