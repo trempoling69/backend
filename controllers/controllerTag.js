@@ -1,5 +1,5 @@
 const { sendSuccessResponse } = require('../middleware/responseTemplate');
-const { findTagByType } = require('../services/tag');
+const { findTagByType, findAllTags } = require('../services/tag');
 
 const getTagByType = async (req, res, next) => {
   try {
@@ -11,4 +11,12 @@ const getTagByType = async (req, res, next) => {
   }
 };
 
-module.exports = { getTagByType };
+const getAllTags = async (req, res, next) => {
+  try {
+    const tags = await findAllTags();
+    sendSuccessResponse(tags, res, 200);
+  } catch (error) {
+    next(error);
+  }
+};
+module.exports = { getTagByType, getAllTags };

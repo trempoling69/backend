@@ -75,7 +75,7 @@ app.use('/api/price', price_routes);
 app.use('/api/order', order_routes);
 app.use('/api/pot', pot_routes);
 app.use('/api/categoryprice', categoryPrice_routes);
-app.use('/api/tag', tag_routes);
+app.use('/api/tags', tag_routes);
 
 //*ROUTE POUR LE QUIZ
 app.use('/quiz', quiz_routes);
